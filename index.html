@@ -178,6 +178,13 @@
       border-radius: 24px;
       background: linear-gradient(135deg, #182116, #0b0f14);
       border: 1px solid #2b3825;
+    {
+        <section style="padding:60px 24px;background:#0b0f14;text-align:center;">
+        <h2 style="font-size:32px;">Anúncios disponíveis</h2>
+        <p style="color:#bbb;">Veículos clássicos aprovados pela plataforma.</p>
+        <div id="anuncios" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;max-width:1100px;margin:30px auto 0;"></div>
+        </section>
+    }
     }
     footer {
       padding: 32px 24px;
@@ -198,6 +205,62 @@
 </head>
 
 <body>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA9-eYhr2Bdadd4OWD17zIRszs3LrxeBc",
+    authDomain: "clube-da-caminhonete-be770.firebaseapp.com",
+    projectId: "clube-da-caminhonete-be770",
+    storageBucket: "clube-da-caminhonete-be770.firebasestorage.app",
+    messagingSenderId: "559157035885",
+    appId: "1:559157035885:web:dd265c86d0a3db6a6b9064",
+    measurementId: "G-WE21MNN4H3"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  async function carregarAnuncios() {
+    const container = document.getElementById("anuncios");
+
+    if (!container) return;
+
+    container.innerHTML = "<p style='color:#aaa;'>Carregando anúncios...</p>";
+
+    const querySnapshot = await getDocs(collection(db, "anuncios"));
+
+    container.innerHTML = "";
+
+    querySnapshot.forEach((doc) => {
+      const anuncio = doc.data();
+
+      if (anuncio.status === "aprovado") {
+        container.innerHTML += `
+          <div style="background:#151b14;border:1px solid #2b3825;border-radius:18px;padding:24px;text-align:left;">
+            <h3 style="margin-top:0;color:#fff;">${anuncio.titulo}</h3>
+            <p style="color:#ccc;">${anuncio.marca} ${anuncio.modelo} • ${anuncio.ano}</p>
+            <p style="color:#d9c48f;font-size:22px;font-weight:bold;">R$ ${Number(anuncio.preco).toLocaleString("pt-BR")}</p>
+            <p style="color:#aaa;">${anuncio.cidade} - ${anuncio.estado}</p>
+            <p style="color:#ccc;">${anuncio.descricao}</p>
+            <a href="https://wa.me/5561991663179?text=Olá! Tenho interesse no anúncio ${encodeURIComponent(anuncio.titulo)}" target="_blank">
+              <button style="width:100%;margin-top:12px;padding:14px;border-radius:10px;border:0;background:#d9c48f;color:#111;font-weight:bold;cursor:pointer;">
+                Tenho interesse
+              </button>
+            </a>
+          </div>
+        `;
+      }
+    });
+
+    if (container.innerHTML === "") {
+      container.innerHTML = "<p style='color:#aaa;'>Nenhum anúncio aprovado no momento.</p>";
+    }
+  }
+
+  carregarAnuncios();
+</script>
   <header class="header">
     <div class="brand">
       <img src="assets/images/icon.png" alt="Logo Clube da Caminhonete" />
