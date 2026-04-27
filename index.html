@@ -3,362 +3,254 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>O Melhor Site de Carros Antigos do Brasil | Clube da Caminhonete</title>
-  <meta name="description" content="O melhor site de carros antigos do Brasil. Compre, venda e anuncie carros antigos, caminhonetes, motos e veículos clássicos com mais de 25 anos." />
-  <meta name="keywords" content="carros antigos, veículos clássicos, caminhonetes antigas, carros antigos a venda, motos antigas, anunciar carro antigo, marketplace de veículos clássicos" />
-  <meta name="author" content="Clube da Caminhonete" />
+
+  <meta name="description" content="Compre, venda e anuncie carros antigos, caminhonetes, motos e veículos clássicos com mais de 25 anos." />
+  <meta name="keywords" content="carros antigos, veículos clássicos, caminhonetes antigas, motos antigas, anunciar carro antigo" />
   <meta name="robots" content="index, follow" />
 
-  <meta property="og:title" content="O Melhor Site de Carros Antigos do Brasil | Clube da Caminhonete" />
-  <meta property="og:description" content="Compre, venda e anuncie carros antigos, caminhonetes, motos e veículos clássicos com mais de 25 anos." />
+  <meta property="og:title" content="Clube da Caminhonete" />
+  <meta property="og:description" content="Marketplace de veículos clássicos do Brasil" />
   <meta property="og:image" content="https://clubedacaminhonete.com.br/assets/images/banner.png" />
   <meta property="og:url" content="https://clubedacaminhonete.com.br" />
-  <meta property="og:type" content="website" />
 
   <style>
-    * { box-sizing: border-box; }
     body {
       margin: 0;
       background: #0b0f14;
       color: #fff;
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: Arial, sans-serif;
     }
-    a { color: inherit; }
+
     .header {
       position: fixed;
       top: 0;
-      left: 0;
-      right: 0;
-      z-index: 10;
-      background: rgba(7, 10, 13, 0.94);
-      padding: 14px 28px;
+      width: 100%;
+      background: #070a0d;
+      padding: 15px 25px;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid #243024;
-      backdrop-filter: blur(8px);
-    }
-    .brand {
-      display: flex;
       align-items: center;
-      gap: 12px;
+      border-bottom: 1px solid #1f2a1f;
+      z-index: 10;
     }
-    .brand img {
-      width: 54px;
-      height: 54px;
+
+    .header img {
+      width: 45px;
       border-radius: 50%;
-      object-fit: cover;
-      background: #111;
     }
-    .brand strong {
-      font-size: 18px;
-      display: block;
-    }
-    .brand span {
-      color: #aaa;
-      font-size: 13px;
-    }
-    .nav-link {
-      color: #d9c48f;
-      text-decoration: none;
-      font-weight: 700;
-    }
+
     .hero {
       min-height: 100vh;
       background:
-        linear-gradient(rgba(0,0,0,.78), rgba(0,0,0,.95)),
-        url('assets/images/banner.png');
+        linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.95)),
+        url("assets/images/banner.png");
       background-size: cover;
       background-position: center;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 125px 24px 70px;
+      padding-top: 120px;
     }
-    .hero-inner {
-      max-width: 940px;
-      margin: 0 auto;
-    }
-    .hero-logo {
-      width: 150px;
-      max-width: 42vw;
-      border-radius: 22px;
-      margin-bottom: 24px;
-      box-shadow: 0 20px 70px rgba(0,0,0,.55);
-      background: #111;
-    }
+
     h1 {
-      font-size: clamp(38px, 6vw, 68px);
-      line-height: 1.04;
-      margin: 0 0 18px;
-      letter-spacing: -1.5px;
+      font-size: 48px;
+      margin-bottom: 15px;
     }
+
     .subtitle {
-      font-size: clamp(18px, 2.6vw, 24px);
-      line-height: 1.5;
-      color: #f2f2f2;
-      max-width: 820px;
-      margin: 0 auto 30px;
+      font-size: 20px;
+      color: #ccc;
+      margin-bottom: 30px;
     }
-    .tags {
-      margin-top: 18px;
-      color: #d8d8d8;
-      font-size: 15px;
-    }
+
     .button {
-      display: inline-block;
-      padding: 17px 32px;
-      border-radius: 14px;
       background: #d9c48f;
       color: #111;
-      font-size: 17px;
-      font-weight: 800;
+      padding: 15px 30px;
+      border-radius: 10px;
       text-decoration: none;
-      box-shadow: 0 14px 35px rgba(217,196,143,.18);
+      font-weight: bold;
     }
+
     .section {
-      padding: 72px 24px;
+      padding: 60px 20px;
       text-align: center;
     }
-    .section.dark-green { background: #101711; }
-    .section h2 {
-      font-size: clamp(28px, 4vw, 40px);
-      margin: 0 0 12px;
-    }
-    .section-lead {
-      color: #bbb;
-      max-width: 760px;
-      margin: 0 auto 38px;
-      line-height: 1.6;
-      font-size: 17px;
-    }
+
     .cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
       gap: 20px;
-      max-width: 1100px;
-      margin: 0 auto;
+      max-width: 1000px;
+      margin: auto;
     }
+
     .card {
-      background: #182116;
-      padding: 30px;
-      border-radius: 20px;
+      background: #151b14;
+      padding: 20px;
+      border-radius: 12px;
       border: 1px solid #2b3825;
-      text-align: left;
     }
-    .card h3 {
-      margin-top: 0;
-      font-size: 22px;
-    }
-    .card p {
-      color: #ccc;
-      line-height: 1.55;
-      margin-bottom: 0;
-    }
+
     .gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 18px;
-      max-width: 1180px;
-      margin: 0 auto;
+      grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+      gap: 15px;
+      max-width: 1100px;
+      margin: auto;
     }
+
     .gallery img {
       width: 100%;
-      height: 280px;
+      height: 250px;
       object-fit: cover;
-      border-radius: 18px;
-      border: 1px solid #263126;
-      background: #111;
+      border-radius: 10px;
     }
-    .cta-box {
-      max-width: 850px;
-      margin: 0 auto;
-      padding: 42px 28px;
-      border-radius: 24px;
-      background: linear-gradient(135deg, #182116, #0b0f14);
-      border: 1px solid #2b3825;
-    {
-        <section style="padding:60px 24px;background:#0b0f14;text-align:center;">
-        <h2 style="font-size:32px;">Anúncios disponíveis</h2>
-        <p style="color:#bbb;">Veículos clássicos aprovados pela plataforma.</p>
-        <div id="anuncios" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;max-width:1100px;margin:30px auto 0;"></div>
-        </section>
-    }
-    }
+
     footer {
-      padding: 32px 24px;
       text-align: center;
+      padding: 30px;
       background: #070a0d;
       color: #aaa;
-      border-top: 1px solid #243024;
-      line-height: 1.7;
-    }
-    @media (max-width: 640px) {
-      .header { padding: 12px 16px; }
-      .brand img { width: 46px; height: 46px; }
-      .brand span { display: none; }
-      .hero { padding-top: 110px; }
-      .gallery img { height: 220px; }
     }
   </style>
 </head>
 
 <body>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyA9-eYhr2Bdadd4OWD17zIRszs3LrxeBc",
-    authDomain: "clube-da-caminhonete-be770.firebaseapp.com",
-    projectId: "clube-da-caminhonete-be770",
-    storageBucket: "clube-da-caminhonete-be770.firebasestorage.app",
-    messagingSenderId: "559157035885",
-    appId: "1:559157035885:web:dd265c86d0a3db6a6b9064",
-    measurementId: "G-WE21MNN4H3"
-  };
+<header class="header">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <img src="assets/images/icon.png">
+    <strong>Clube da Caminhonete</strong>
+  </div>
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  <a href="https://wa.me/5561991663179" style="color:#d9c48f;">WhatsApp</a>
+</header>
 
-  async function carregarAnuncios() {
-    const container = document.getElementById("anuncios");
+<main>
 
-    if (!container) return;
+<section class="hero">
+  <div>
+    <h1>O Melhor Site de Carros Antigos do Brasil</h1>
 
-    container.innerHTML = "<p style='color:#aaa;'>Carregando anúncios...</p>";
+    <p class="subtitle">
+      Compre, venda e anuncie carros antigos, caminhonetes, motos e veículos clássicos com mais de 25 anos.
+    </p>
 
-    const querySnapshot = await getDocs(collection(db, "anuncios"));
+    <a class="button" href="https://wa.me/5561991663179">
+      Anunciar veículo
+    </a>
+  </div>
+</section>
 
-    container.innerHTML = "";
+<section class="section">
+  <h2>Sobre a plataforma</h2>
 
-    querySnapshot.forEach((doc) => {
-      const anuncio = doc.data();
-
-      if (anuncio.status === "aprovado") {
-        container.innerHTML += `
-          <div style="background:#151b14;border:1px solid #2b3825;border-radius:18px;padding:24px;text-align:left;">
-            <h3 style="margin-top:0;color:#fff;">${anuncio.titulo}</h3>
-            <p style="color:#ccc;">${anuncio.marca} ${anuncio.modelo} • ${anuncio.ano}</p>
-            <p style="color:#d9c48f;font-size:22px;font-weight:bold;">R$ ${Number(anuncio.preco).toLocaleString("pt-BR")}</p>
-            <p style="color:#aaa;">${anuncio.cidade} - ${anuncio.estado}</p>
-            <p style="color:#ccc;">${anuncio.descricao}</p>
-            <a href="https://wa.me/5561991663179?text=Olá! Tenho interesse no anúncio ${encodeURIComponent(anuncio.titulo)}" target="_blank">
-              <button style="width:100%;margin-top:12px;padding:14px;border-radius:10px;border:0;background:#d9c48f;color:#111;font-weight:bold;cursor:pointer;">
-                Tenho interesse
-              </button>
-            </a>
-          </div>
-        `;
-      }
-    });
-
-    if (container.innerHTML === "") {
-      container.innerHTML = "<p style='color:#aaa;'>Nenhum anúncio aprovado no momento.</p>";
-    }
-  }
-
-  carregarAnuncios();
-</script>
-  <header class="header">
-    <div class="brand">
-      <img src="assets/images/icon.png" alt="Logo Clube da Caminhonete" />
-      <div>
-        <strong>Clube da Caminhonete</strong>
-        <span>Marketplace de veículos clássicos</span>
-      </div>
+  <div class="cards">
+    <div class="card">
+      <h3>Anuncie</h3>
+      <p>Divulgue seu veículo para milhares de interessados.</p>
     </div>
-    <a class="nav-link" href="https://wa.me/5561991663179?text=Olá! Tenho interesse no Clube da Caminhonete." target="_blank" rel="noopener">WhatsApp</a>
-  </header>
 
-  <main>
-    <section class="hero">
-      <div class="hero-inner">
-        <img class="hero-logo" src="assets/images/icon.png" alt="Clube da Caminhonete - veículos clássicos" />
+    <div class="card">
+      <h3>Encontre</h3>
+      <p>Descubra veículos raros e clássicos.</p>
+    </div>
 
-        <h1>O Melhor Site de Carros Antigos do Brasil</h1>
+    <div class="card">
+      <h3>Negocie</h3>
+      <p>Contato direto com vendedores via WhatsApp.</p>
+    </div>
+  </div>
+</section>
 
-        <p class="subtitle">
-          Compre, venda e anuncie carros antigos, caminhonetes, motos e veículos clássicos com mais de 25 anos.
-          Uma plataforma para apaixonados por veículos com história.
-        </p>
+<section class="section">
+  <h2>Galeria</h2>
 
-        <a class="button" href="https://wa.me/5561991663179?text=Olá! Quero anunciar meu veículo clássico." target="_blank" rel="noopener">
-          Anunciar veículo agora
-        </a>
+  <div class="gallery">
+    <img src="assets/images/foto1.png">
+    <img src="assets/images/foto2.png">
+    <img src="assets/images/foto3.png">
+    <img src="assets/images/foto4.png">
+  </div>
+</section>
 
-        <p class="tags">Desde 2019 • Veículos clássicos • Anúncios em todo o Brasil</p>
-      </div>
-    </section>
+<!-- 🔥 ANÚNCIOS DINÂMICOS -->
+<section class="section">
+  <h2>Anúncios disponíveis</h2>
+  <p style="color:#bbb;">Somente anúncios aprovados</p>
 
-    <section class="section dark-green">
-      <h2>Uma empresa para quem vive a paixão por clássicos</h2>
-      <p class="section-lead">
-        Aproximamos vendedores, compradores, colecionadores e entusiastas em um ambiente focado em veículos antigos e clássicos.
-      </p>
+  <div id="anuncios" style="
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:20px;
+    max-width:1100px;
+    margin:30px auto;
+  "></div>
+</section>
 
-      <div class="cards">
-        <article class="card">
-          <h3>Anuncie seu clássico</h3>
-          <p>Divulgue carros, caminhonetes, motos e veículos antigos para um público realmente interessado.</p>
-        </article>
+</main>
 
-        <article class="card">
-          <h3>Encontre raridades</h3>
-          <p>Busque veículos com história, personalidade e mais de 25 anos em todo o Brasil.</p>
-        </article>
+<footer>
+  Clube da Caminhonete © 2026
+</footer>
 
-        <article class="card">
-          <h3>Negocie direto</h3>
-          <p>Fale pelo WhatsApp e converse diretamente sobre o veículo, anúncio ou interesse de compra.</p>
-        </article>
-      </div>
-    </section>
+<!-- 🔥 FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
-    <section class="section">
-      <h2>Galeria de Clássicos</h2>
-      <p class="section-lead">
-        Carros antigos, caminhonetes clássicas, motos e veículos especiais que representam história, restauração e paixão automotiva.
-      </p>
+const firebaseConfig = {
+  apiKey: "AIzaSyA9-eYhr2Bdadd4OWD17zIRszs3LrxeBc",
+  authDomain: "clube-da-caminhonete-be770.firebaseapp.com",
+  projectId: "clube-da-caminhonete-be770",
+  storageBucket: "clube-da-caminhonete-be770.firebasestorage.app",
+  messagingSenderId: "559157035885",
+  appId: "1:559157035885:web:dd265c86d0a3db6a6b9064"
+};
 
-      <div class="gallery">
-        <img src="assets/images/foto1.png" alt="Carro antigo clássico anunciado no Clube da Caminhonete" loading="lazy" />
-        <img src="assets/images/foto2.png" alt="Caminhonete antiga restaurada para venda" loading="lazy" />
-        <img src="assets/images/foto3.png" alt="Veículo clássico com mais de 25 anos" loading="lazy" />
-        <img src="assets/images/foto4.png" alt="Carro clássico antigo no Brasil" loading="lazy" />
-        <img src="assets/images/foto5.png" alt="Veículo antigo de coleção anunciado online" loading="lazy" />
-        <img src="assets/images/foto6.png" alt="Caminhonete clássica e carro antigo restaurado" loading="lazy" />
-      </div>
-    </section>
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-    <section class="section dark-green">
-      <div class="cta-box">
-        <h2>Quer anunciar seu veículo antigo?</h2>
-        <p class="section-lead" style="margin-bottom:28px;">
-          Entre em contato e saiba como divulgar seu carro, caminhonete, moto ou veículo clássico para compradores qualificados.
-        </p>
-        <a class="button" href="https://wa.me/5561991663179?text=Olá! Quero anunciar meu veículo antigo no Clube da Caminhonete." target="_blank" rel="noopener">
-          Falar com a equipe
-        </a>
-      </div>
-    </section>
+async function carregarAnuncios() {
+  const container = document.getElementById("anuncios");
 
-    <section class="section">
-      <h2>Em breve, também no app</h2>
-      <p class="section-lead">
-        Estamos preparando uma plataforma com anúncios, busca, favoritos e contato direto entre compradores e vendedores de veículos clássicos.
-      </p>
-      <a class="button" href="https://wa.me/5561991663179?text=Olá! Quero saber quando o app Clube da Caminhonete estiver disponível." target="_blank" rel="noopener">
-        Quero ser avisado
-      </a>
-    </section>
-  </main>
+  container.innerHTML = "Carregando anúncios...";
 
-  <footer>
-    <strong>Clube da Caminhonete</strong><br />
-    O Melhor Site de Carros Antigos do Brasil<br />
-    clubedacaminhonete.com.br
-  </footer>
+  const snapshot = await getDocs(collection(db, "anuncios"));
+
+  container.innerHTML = "";
+
+  snapshot.forEach(doc => {
+    const a = doc.data();
+
+    if (a.status === "aprovado") {
+      container.innerHTML += `
+        <div style="background:#151b14;padding:20px;border-radius:12px;">
+          <h3>${a.titulo}</h3>
+          <p>${a.marca} ${a.modelo} - ${a.ano}</p>
+          <p style="color:#d9c48f;font-weight:bold;">R$ ${a.preco}</p>
+          <p>${a.cidade} - ${a.estado}</p>
+          <a href="https://wa.me/5561991663179?text=Tenho interesse em ${a.titulo}">
+            <button style="margin-top:10px;padding:10px;background:#d9c48f;border:0;border-radius:8px;">
+              Tenho interesse
+            </button>
+          </a>
+        </div>
+      `;
+    }
+  });
+
+  if (container.innerHTML === "") {
+    container.innerHTML = "Nenhum anúncio aprovado.";
+  }
+}
+
+carregarAnuncios();
+</script>
+
 </body>
 </html>
