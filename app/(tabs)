@@ -1,0 +1,6 @@
+app/(tabs)/index.tsx
+app/(tabs)/busca.tsx
+app/(tabs)/publicar.tsx
+app/(tabs)/favoritos.tsx
+app/(tabs)/perfil.tsx
+app/(tabs)/_layout.tsx
