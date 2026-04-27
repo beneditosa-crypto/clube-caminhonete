@@ -3,51 +3,46 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>O Melhor Site de Carros Antigos do Brasil | Clube da Caminhonete</title>
-
-  <meta name="description" content="Compre, venda e anuncie carros antigos, caminhonetes, motos e veículos clássicos com mais de 25 anos. O marketplace de veículos clássicos do Brasil." />
-  <meta name="keywords" content="carros antigos, veículos clássicos, caminhonetes antigas, motos antigas, anunciar carro antigo, carros antigos à venda" />
+  <meta name="description" content="O melhor site de carros antigos do Brasil. Compre, venda e anuncie carros antigos, caminhonetes, motos e veículos clássicos com mais de 25 anos." />
+  <meta name="keywords" content="carros antigos, veículos clássicos, caminhonetes antigas, carros antigos a venda, motos antigas, anunciar carro antigo, marketplace de veículos clássicos" />
+  <meta name="author" content="Clube da Caminhonete" />
   <meta name="robots" content="index, follow" />
 
-  <meta property="og:title" content="Clube da Caminhonete" />
-  <meta property="og:description" content="Marketplace de veículos clássicos do Brasil" />
+  <meta property="og:title" content="O Melhor Site de Carros Antigos do Brasil | Clube da Caminhonete" />
+  <meta property="og:description" content="Compre, venda e anuncie carros antigos, caminhonetes, motos e veículos clássicos com mais de 25 anos." />
   <meta property="og:image" content="https://clubedacaminhonete.com.br/assets/images/banner.png" />
   <meta property="og:url" content="https://clubedacaminhonete.com.br" />
+  <meta property="og:type" content="website" />
 
   <style>
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
-      background: #f4f1e8;
-      color: #1b1b1b;
+      background: #0b0f14;
+      color: #fff;
       font-family: Arial, Helvetica, sans-serif;
     }
-
-    a { text-decoration: none; }
-
+    a { color: inherit; }
     .header {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
-      z-index: 20;
-      background: rgba(255, 255, 255, 0.96);
-      border-bottom: 1px solid #ddd2b8;
+      z-index: 10;
+      background: rgba(7, 10, 13, 0.94);
       padding: 14px 28px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 6px 20px rgba(0,0,0,.08);
+      border-bottom: 1px solid #243024;
+      backdrop-filter: blur(8px);
     }
-
     .brand {
       display: flex;
       align-items: center;
       gap: 12px;
     }
-
     .brand img {
       width: 54px;
       height: 54px;
@@ -55,474 +50,252 @@
       object-fit: cover;
       background: #111;
     }
-
     .brand strong {
-      display: block;
       font-size: 18px;
-      color: #111;
+      display: block;
     }
-
     .brand span {
+      color: #aaa;
       font-size: 13px;
-      color: #555;
     }
-
-    .nav {
-      display: flex;
-      gap: 18px;
-      align-items: center;
-      font-weight: bold;
+    .nav-link {
+      color: #d9c48f;
+      text-decoration: none;
+      font-weight: 700;
     }
-
-    .nav a {
-      color: #17351f;
-    }
-
     .hero {
-      min-height: 92vh;
+      min-height: 100vh;
       background:
-        linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.88)),
-        url("assets/images/banner.png");
+        linear-gradient(rgba(0,0,0,.78), rgba(0,0,0,.95)),
+        url('assets/images/banner.png');
       background-size: cover;
       background-position: center;
-      color: white;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 130px 24px 70px;
+      padding: 125px 24px 70px;
     }
-
     .hero-inner {
-      max-width: 950px;
+      max-width: 940px;
+      margin: 0 auto;
     }
-
     .hero-logo {
       width: 150px;
+      max-width: 42vw;
       border-radius: 22px;
       margin-bottom: 24px;
-      box-shadow: 0 18px 55px rgba(0,0,0,.55);
+      box-shadow: 0 20px 70px rgba(0,0,0,.55);
       background: #111;
     }
-
     h1 {
       font-size: clamp(38px, 6vw, 68px);
       line-height: 1.04;
       margin: 0 0 18px;
-      letter-spacing: -1.4px;
+      letter-spacing: -1.5px;
     }
-
     .subtitle {
-      font-size: clamp(18px, 2.3vw, 24px);
+      font-size: clamp(18px, 2.6vw, 24px);
       line-height: 1.5;
+      color: #f2f2f2;
       max-width: 820px;
       margin: 0 auto 30px;
-      color: #f2f2f2;
     }
-
+    .tags {
+      margin-top: 18px;
+      color: #d8d8d8;
+      font-size: 15px;
+    }
     .button {
       display: inline-block;
-      padding: 16px 30px;
+      padding: 17px 32px;
       border-radius: 14px;
       background: #d9c48f;
       color: #111;
+      font-size: 17px;
       font-weight: 800;
-      box-shadow: 0 12px 30px rgba(0,0,0,.25);
+      text-decoration: none;
+      box-shadow: 0 14px 35px rgba(217,196,143,.18);
     }
-
     .section {
       padding: 72px 24px;
       text-align: center;
     }
-
+    .section.dark-green { background: #101711; }
     .section h2 {
-      font-size: clamp(28px, 4vw, 42px);
+      font-size: clamp(28px, 4vw, 40px);
       margin: 0 0 12px;
-      color: #17351f;
     }
-
     .section-lead {
+      color: #bbb;
       max-width: 760px;
       margin: 0 auto 38px;
-      color: #555;
-      font-size: 17px;
       line-height: 1.6;
+      font-size: 17px;
     }
-
     .cards {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 22px;
+      gap: 20px;
       max-width: 1100px;
       margin: 0 auto;
     }
-
     .card {
-      background: white;
-      border-radius: 22px;
+      background: #182116;
       padding: 30px;
+      border-radius: 20px;
+      border: 1px solid #2b3825;
       text-align: left;
-      border: 1px solid #e0d7bf;
-      box-shadow: 0 12px 30px rgba(0,0,0,.06);
     }
-
     .card h3 {
       margin-top: 0;
-      color: #17351f;
+      font-size: 22px;
     }
-
     .card p {
-      color: #555;
+      color: #ccc;
       line-height: 1.55;
+      margin-bottom: 0;
     }
-
     .gallery {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      max-width: 1150px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      max-width: 1180px;
       margin: 0 auto;
     }
-
     .gallery img {
       width: 100%;
       height: 280px;
       object-fit: cover;
-      border-radius: 20px;
-      border: 1px solid #ddd2b8;
-      box-shadow: 0 14px 35px rgba(0,0,0,.12);
+      border-radius: 18px;
+      border: 1px solid #263126;
       background: #111;
     }
-
-    .highlight-section {
-      background: #17351f;
-      color: white;
-    }
-
-    .highlight-section h2 {
-      color: #d9c48f;
-    }
-
-    .highlight-section .section-lead {
-      color: #e6e0cf;
-    }
-
-    .dynamic-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-      max-width: 1150px;
-      margin: 34px auto 0;
-    }
-
-    .dynamic-card {
-      background: #fff;
-      color: #111;
-      padding: 26px;
-      border-radius: 22px;
-      text-align: left;
-      border: 1px solid #ddd2b8;
-      box-shadow: 0 14px 35px rgba(0,0,0,.12);
-    }
-
-    .dynamic-card h3 {
-      margin-top: 0;
-      color: #17351f;
-    }
-
-    .price {
-      color: #8b6f2f;
-      font-size: 24px;
-      font-weight: 900;
-    }
-
-    .social-box {
-      background: white;
-      max-width: 900px;
+    .cta-box {
+      max-width: 850px;
       margin: 0 auto;
-      padding: 38px 28px;
-      border-radius: 26px;
-      border: 1px solid #e0d7bf;
-      box-shadow: 0 14px 35px rgba(0,0,0,.08);
+      padding: 42px 28px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, #182116, #0b0f14);
+      border: 1px solid #2b3825;
     }
-
-    .social-links {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 16px;
-      margin-top: 24px;
-    }
-
-    .social-links a {
-      background: #17351f;
-      color: white;
-      padding: 14px 22px;
-      border-radius: 12px;
-      font-weight: bold;
-    }
-
     footer {
-      background: #0b0f14;
-      color: #ddd;
+      padding: 32px 24px;
       text-align: center;
-      padding: 34px 24px;
+      background: #070a0d;
+      color: #aaa;
+      border-top: 1px solid #243024;
       line-height: 1.7;
     }
-
-    @media (max-width: 760px) {
-      .header {
-        padding: 12px 16px;
-      }
-
-      .brand span {
-        display: none;
-      }
-
-      .nav {
-        gap: 10px;
-        font-size: 14px;
-      }
-
-      .gallery {
-        grid-template-columns: 1fr;
-      }
-
-      .gallery img {
-        height: 230px;
-      }
+    @media (max-width: 640px) {
+      .header { padding: 12px 16px; }
+      .brand img { width: 46px; height: 46px; }
+      .brand span { display: none; }
+      .hero { padding-top: 110px; }
+      .gallery img { height: 220px; }
     }
   </style>
 </head>
 
 <body>
-
-<header class="header">
-  <div class="brand">
-    <img src="assets/images/icon.png" alt="Logo Clube da Caminhonete" />
-    <div>
-      <strong>Clube da Caminhonete</strong>
-      <span>Marketplace de veículos clássicos</span>
+  <header class="header">
+    <div class="brand">
+      <img src="assets/images/icon.png" alt="Logo Clube da Caminhonete" />
+      <div>
+        <strong>Clube da Caminhonete</strong>
+        <span>Marketplace de veículos clássicos</span>
+      </div>
     </div>
-  </div>
+    <a class="nav-link" href="https://wa.me/5561991663179?text=Olá! Tenho interesse no Clube da Caminhonete." target="_blank" rel="noopener">WhatsApp</a>
+  </header>
 
-  <nav class="nav">
-    <a href="#anuncios-section">Anúncios</a>
-    <a href="#eventos-section">Eventos</a>
-    <a href="https://wa.me/5561991663179?text=Olá! Tenho interesse no Clube da Caminhonete." target="_blank">WhatsApp</a>
-  </nav>
-</header>
+  <main>
+    <section class="hero">
+      <div class="hero-inner">
+        <img class="hero-logo" src="assets/images/icon.png" alt="Clube da Caminhonete - veículos clássicos" />
 
-<main>
+        <h1>O Melhor Site de Carros Antigos do Brasil</h1>
 
-<section class="hero">
-  <div class="hero-inner">
-    <img class="hero-logo" src="assets/images/icon.png" alt="Clube da Caminhonete - veículos clássicos" />
+        <p class="subtitle">
+          Compre, venda e anuncie carros antigos, caminhonetes, motos e veículos clássicos com mais de 25 anos.
+          Uma plataforma para apaixonados por veículos com história.
+        </p>
 
-    <h1>O Melhor Site de Carros Antigos do Brasil</h1>
+        <a class="button" href="https://wa.me/5561991663179?text=Olá! Quero anunciar meu veículo clássico." target="_blank" rel="noopener">
+          Anunciar veículo agora
+        </a>
 
-    <p class="subtitle">
-      Compre, venda e anuncie carros antigos, caminhonetes, motos e veículos clássicos com mais de 25 anos.
-      Uma plataforma para apaixonados por veículos com história.
-    </p>
+        <p class="tags">Desde 2019 • Veículos clássicos • Anúncios em todo o Brasil</p>
+      </div>
+    </section>
 
-    <a class="button" href="https://wa.me/5561991663179?text=Olá! Quero anunciar meu veículo clássico." target="_blank">
-      Anunciar veículo agora
-    </a>
+    <section class="section dark-green">
+      <h2>Uma empresa para quem vive a paixão por clássicos</h2>
+      <p class="section-lead">
+        Aproximamos vendedores, compradores, colecionadores e entusiastas em um ambiente focado em veículos antigos e clássicos.
+      </p>
 
-    <p style="margin-top:20px;color:#ddd;">
-      Desde 2019 • Veículos clássicos • Anúncios em todo o Brasil
-    </p>
-  </div>
-</section>
+      <div class="cards">
+        <article class="card">
+          <h3>Anuncie seu clássico</h3>
+          <p>Divulgue carros, caminhonetes, motos e veículos antigos para um público realmente interessado.</p>
+        </article>
 
-<section class="section">
-  <h2>Uma empresa para quem vive a paixão por clássicos</h2>
-  <p class="section-lead">
-    Aproximamos vendedores, compradores, colecionadores, lojas parceiras e entusiastas em um ambiente focado em veículos antigos.
-  </p>
+        <article class="card">
+          <h3>Encontre raridades</h3>
+          <p>Busque veículos com história, personalidade e mais de 25 anos em todo o Brasil.</p>
+        </article>
 
-  <div class="cards">
-    <article class="card">
-      <h3>Anuncie seu clássico</h3>
-      <p>Divulgue carros, caminhonetes, motos e veículos antigos para um público qualificado.</p>
-    </article>
+        <article class="card">
+          <h3>Negocie direto</h3>
+          <p>Fale pelo WhatsApp e converse diretamente sobre o veículo, anúncio ou interesse de compra.</p>
+        </article>
+      </div>
+    </section>
 
-    <article class="card">
-      <h3>Encontre raridades</h3>
-      <p>Busque veículos com história, personalidade e mais de 25 anos em todo o Brasil.</p>
-    </article>
+    <section class="section">
+      <h2>Galeria de Clássicos</h2>
+      <p class="section-lead">
+        Carros antigos, caminhonetes clássicas, motos e veículos especiais que representam história, restauração e paixão automotiva.
+      </p>
 
-    <article class="card">
-      <h3>Lojas parceiras</h3>
-      <p>Parceiros poderão ter lojas oficiais dentro da plataforma, com seus próprios anúncios e eventos.</p>
-    </article>
-  </div>
-</section>
+      <div class="gallery">
+        <img src="assets/images/foto1.png" alt="Carro antigo clássico anunciado no Clube da Caminhonete" loading="lazy" />
+        <img src="assets/images/foto2.png" alt="Caminhonete antiga restaurada para venda" loading="lazy" />
+        <img src="assets/images/foto3.png" alt="Veículo clássico com mais de 25 anos" loading="lazy" />
+        <img src="assets/images/foto4.png" alt="Carro clássico antigo no Brasil" loading="lazy" />
+        <img src="assets/images/foto5.png" alt="Veículo antigo de coleção anunciado online" loading="lazy" />
+        <img src="assets/images/foto6.png" alt="Caminhonete clássica e carro antigo restaurado" loading="lazy" />
+      </div>
+    </section>
 
-<section class="section">
-  <h2>Galeria de Clássicos</h2>
-  <p class="section-lead">
-    Carros antigos, caminhonetes clássicas, motos e veículos especiais que representam história, restauração e paixão automotiva.
-  </p>
+    <section class="section dark-green">
+      <div class="cta-box">
+        <h2>Quer anunciar seu veículo antigo?</h2>
+        <p class="section-lead" style="margin-bottom:28px;">
+          Entre em contato e saiba como divulgar seu carro, caminhonete, moto ou veículo clássico para compradores qualificados.
+        </p>
+        <a class="button" href="https://wa.me/5561991663179?text=Olá! Quero anunciar meu veículo antigo no Clube da Caminhonete." target="_blank" rel="noopener">
+          Falar com a equipe
+        </a>
+      </div>
+    </section>
 
-  <div class="gallery">
-    <img src="assets/images/foto1.png" alt="Carro antigo clássico anunciado no Clube da Caminhonete" loading="lazy" />
-    <img src="assets/images/foto2.png" alt="Caminhonete antiga restaurada para venda" loading="lazy" />
-    <img src="assets/images/foto3.png" alt="Veículo clássico com mais de 25 anos" loading="lazy" />
-    <img src="assets/images/foto4.png" alt="Carro clássico antigo no Brasil" loading="lazy" />
-    <img src="assets/images/foto5.png" alt="Veículo antigo de coleção anunciado online" loading="lazy" />
-    <img src="assets/images/foto6.png" alt="Caminhonete clássica e carro antigo restaurado" loading="lazy" />
-  </div>
-</section>
+    <section class="section">
+      <h2>Em breve, também no app</h2>
+      <p class="section-lead">
+        Estamos preparando uma plataforma com anúncios, busca, favoritos e contato direto entre compradores e vendedores de veículos clássicos.
+      </p>
+      <a class="button" href="https://wa.me/5561991663179?text=Olá! Quero saber quando o app Clube da Caminhonete estiver disponível." target="_blank" rel="noopener">
+        Quero ser avisado
+      </a>
+    </section>
+  </main>
 
-<section id="anuncios-section" class="section highlight-section">
-  <h2>Anúncios disponíveis</h2>
-  <p class="section-lead">
-    Veículos clássicos aprovados pela plataforma.
-  </p>
-
-  <div id="anuncios" class="dynamic-grid"></div>
-</section>
-
-<section id="eventos-section" class="section">
-  <h2>Eventos próximos</h2>
-  <p class="section-lead">
-    Encontros, exposições e eventos de veículos clássicos para divulgar no WhatsApp, Instagram e Facebook.
-  </p>
-
-  <div id="eventos" class="dynamic-grid"></div>
-</section>
-
-<section class="section">
-  <div class="social-box">
-    <h2>Acompanhe nossas mídias</h2>
-    <p class="section-lead" style="margin-bottom:0;">
-      Divulgamos anúncios, eventos, encontros e novidades nas redes sociais.
-    </p>
-
-    <div class="social-links">
-      <a href="https://www.instagram.com/clubedacaminhonete" target="_blank">Instagram @clubedacaminhonete</a>
-      <a href="https://www.facebook.com/clubedacaminhonete" target="_blank">Facebook</a>
-      <a href="https://wa.me/5561991663179?text=Olá! Tenho interesse no Clube da Caminhonete." target="_blank">WhatsApp</a>
-    </div>
-  </div>
-</section>
-
-<section class="section">
-  <h2>Em breve, também no app</h2>
-  <p class="section-lead">
-    O app terá publicação de anúncios, eventos, favoritos, lojas parceiras, moderação e contato direto com vendedores.
-  </p>
-
-  <a class="button" href="https://wa.me/5561991663179?text=Olá! Quero saber quando o app Clube da Caminhonete estiver disponível." target="_blank">
-    Quero ser avisado
-  </a>
-</section>
-
-</main>
-
-<footer>
-  <strong>Clube da Caminhonete</strong><br />
-  O Melhor Site de Carros Antigos do Brasil<br />
-  Marketplace de veículos clássicos<br />
-  clubedacaminhonete.com.br
-</footer>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyA9-eYhr2Bdadd4OWD17zIRszs3LrxeBc",
-    authDomain: "clube-da-caminhonete-be770.firebaseapp.com",
-    projectId: "clube-da-caminhonete-be770",
-    storageBucket: "clube-da-caminhonete-be770.firebasestorage.app",
-    messagingSenderId: "559157035885",
-    appId: "1:559157035885:web:dd265c86d0a3db6a6b9064"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  async function carregarAnuncios() {
-    const container = document.getElementById("anuncios");
-    if (!container) return;
-
-    container.innerHTML = "<p>Carregando anúncios...</p>";
-
-    const snapshot = await getDocs(collection(db, "anuncios"));
-    container.innerHTML = "";
-
-    snapshot.forEach(doc => {
-      const a = doc.data();
-
-      if (a.status === "aprovado") {
-        const titulo = a.titulo || "Veículo clássico";
-        const preco = Number(a.preco || 0).toLocaleString("pt-BR");
-
-        container.innerHTML += `
-          <article class="dynamic-card">
-            <h3>${titulo}</h3>
-            <p>${a.marca || ""} ${a.modelo || ""} • ${a.ano || ""}</p>
-            <p class="price">R$ ${preco}</p>
-            <p>${a.cidade || ""} - ${a.estado || ""}</p>
-            <p>${a.descricao || ""}</p>
-            <a class="button" href="https://wa.me/5561991663179?text=Olá! Tenho interesse no anúncio ${encodeURIComponent(titulo)}" target="_blank">
-              Tenho interesse
-            </a>
-          </article>
-        `;
-      }
-    });
-
-    if (container.innerHTML === "") {
-      container.innerHTML = "<p>Nenhum anúncio aprovado no momento.</p>";
-    }
-  }
-
-  async function carregarEventos() {
-    const container = document.getElementById("eventos");
-    if (!container) return;
-
-    container.innerHTML = "<p>Carregando eventos...</p>";
-
-    const snapshot = await getDocs(collection(db, "eventos"));
-    container.innerHTML = "";
-
-    snapshot.forEach(doc => {
-      const e = doc.data();
-
-      if (e.status === "aprovado") {
-        const titulo = e.titulo || "Evento de veículos clássicos";
-        const telefone = e.telefone || "5561991663179";
-
-        const textoWhatsApp = encodeURIComponent(
-          `Olá! Tenho interesse no evento ${titulo} em ${e.cidade || ""}-${e.estado || ""}.`
-        );
-
-        container.innerHTML += `
-          <article class="dynamic-card">
-            <h3>${titulo}</h3>
-            <p>📅 ${e.data || ""} às ${e.hora || ""}</p>
-            <p>📍 ${e.local || ""} — ${e.cidade || ""} - ${e.estado || ""}</p>
-            <p>${e.descricao || ""}</p>
-            <a class="button" href="https://wa.me/${telefone}?text=${textoWhatsApp}" target="_blank">
-              Falar sobre o evento
-            </a>
-          </article>
-        `;
-      }
-    });
-
-    if (container.innerHTML === "") {
-      container.innerHTML = "<p>Nenhum evento aprovado no momento.</p>";
-    }
-  }
-
-  carregarAnuncios();
-  carregarEventos();
-</script>
-
+  <footer>
+    <strong>Clube da Caminhonete</strong><br />
+    O Melhor Site de Carros Antigos do Brasil<br />
+    clubedacaminhonete.com.br
+  </footer>
 </body>
 </html>
