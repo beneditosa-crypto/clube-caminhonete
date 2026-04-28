@@ -1,238 +1,663 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- ================= 1. SEO / CONFIGURAÇÕES ================= -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<title>Clube da Caminhonete</title>
+  <title>Clube da Caminhonete | Carros Antigos, Caminhonetes e Clássicos</title>
 
-<style>
+  <meta name="description" content="Compre, venda e anuncie carros antigos, caminhonetes, motos e veículos clássicos com mais de 25 anos." />
+  <meta name="keywords" content="carros antigos, veículos clássicos, caminhonetes antigas, motos antigas, anunciar carro antigo" />
+  <meta name="robots" content="index, follow" />
 
-/* ================= BASE ================= */
-* {
-  box-sizing: border-box;
-}
+  <!-- ================= 2. DESIGN / CSS ================= -->
+  <style>
+    * {
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+    }
 
-body {
-  margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  background: #ffffff;
-  color: #1b1b1b;
-}
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #ffffff;
+      color: #1b1b1b;
+    }
 
-a {
-  text-decoration: none;
-}
+    a {
+      text-decoration: none;
+    }
 
-/* ================= HEADER ================= */
-.header {
-  position: fixed;
-  width: 100%;
-  background: rgba(255,255,255,.95);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 20px;
-  border-bottom: 1px solid #ddd;
-  z-index: 10;
-}
+    img {
+      max-width: 100%;
+      display: block;
+    }
 
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: bold;
-  color: #17351f;
-}
+    /* ================= TOPO ================= */
+    .header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 20;
+      background: rgba(255,255,255,.96);
+      border-bottom: 1px solid #ddd;
+      padding: 10px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 6px 20px rgba(0,0,0,.08);
+    }
 
-.brand img {
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-}
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: bold;
+      color: #17351f;
+      white-space: nowrap;
+    }
 
-.nav {
-  display: flex;
-  gap: 12px;
-  font-weight: bold;
-}
+    .brand img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
 
-.nav a {
-  color: #17351f;
-}
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-weight: bold;
+      font-size: 15px;
+    }
 
-.whatsapp-link {
-  color: #25D366;
-}
+    .nav a {
+      color: #17351f;
+    }
 
-/* ================= HERO (SEM TEXTO) ================= */
-.hero {
-  height: 60vh;
-  background:
-    linear-gradient(rgba(0,0,0,.45), rgba(0,0,0,.65)),
-    url("assets/images/banner.png");
-  background-size: cover;
-  background-position: center;
+    .whatsapp-link {
+      color: #25D366 !important;
+    }
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+    /* ================= BANNER LIMPO ================= */
+    .hero {
+      height: 58vh;
+      min-height: 360px;
+      background:
+        linear-gradient(rgba(0,0,0,.18), rgba(0,0,0,.28)),
+        url("assets/images/banner.png");
+      background-size: cover;
+      background-position: center;
+    }
 
-.hero img {
-  width: 140px;
-  height: 140px;
-  border-radius: 28px;
-  box-shadow: 0 20px 50px rgba(0,0,0,.5);
-}
+    /* ================= CHAMADA ABAIXO DO BANNER ================= */
+    .intro-cta {
+      background: #ffffff;
+      text-align: center;
+      padding: 46px 22px 58px;
+    }
 
-/* ================= INTRO ================= */
-.intro {
-  text-align: center;
-  padding: 50px 20px;
-}
+    .intro-cta h1 {
+      color: #17351f;
+      font-size: clamp(32px, 5vw, 56px);
+      margin: 0 0 16px;
+      line-height: 1.08;
+    }
 
-.intro h1 {
-  font-size: 42px;
-  margin-bottom: 15px;
-  color: #17351f;
-}
+    .intro-cta p {
+      max-width: 760px;
+      margin: 0 auto 26px;
+      color: #444;
+      font-size: 20px;
+      line-height: 1.5;
+    }
 
-.intro p {
-  max-width: 700px;
-  margin: 0 auto 25px;
-  font-size: 18px;
-  color: #444;
-}
+    .button {
+      display: inline-block;
+      padding: 15px 26px;
+      border-radius: 12px;
+      background: #d9c48f;
+      color: #111;
+      font-weight: bold;
+      box-shadow: 0 10px 24px rgba(0,0,0,.18);
+      transition: .2s ease;
+    }
 
-.button {
-  padding: 14px 24px;
-  background: #d9c48f;
-  border-radius: 10px;
-  font-weight: bold;
-  color: #111;
-}
+    .button:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.04);
+    }
 
-/* ================= SOCIAL ================= */
-.section {
-  text-align: center;
-  padding: 60px 20px;
-  background: #f4f4f4;
-}
+    /* ================= SEÇÕES ================= */
+    .section {
+      padding: 68px 24px;
+      text-align: center;
+    }
 
-.social-links {
-  display: flex;
-  justify-content: center;
-  gap: 18px;
-  margin-top: 25px;
-}
+    .white {
+      background: #ffffff;
+    }
 
-.social-links a {
-  width: 160px;
-  height: 60px;
-  border-radius: 14px;
+    .cream {
+      background: #f4f1e8;
+    }
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    .green {
+      background: linear-gradient(180deg, #102818, #1c3d25);
+      color: white;
+    }
 
-  font-size: 26px;
-  color: white;
+    .green h2 {
+      color: #d9c48f;
+    }
 
-  box-shadow: 0 8px 18px rgba(0,0,0,.15);
-  transition: .2s;
-}
+    h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      color: #17351f;
+      margin: 0 0 12px;
+    }
 
-.social-links a:hover {
-  transform: translateY(-3px);
-}
+    .lead {
+      max-width: 760px;
+      margin: 0 auto 34px;
+      color: #555;
+      line-height: 1.6;
+      font-size: 17px;
+    }
 
-.instagram {
-  background: linear-gradient(135deg, #833AB4, #E1306C, #FCAF45);
-}
+    .green .lead {
+      color: #e8e2cf;
+    }
 
-.facebook {
-  background: #1877F2;
-}
+    /* ================= CARDS ================= */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 22px;
+      max-width: 1150px;
+      margin: 34px auto 0;
+    }
 
-.whatsapp-social {
-  background: #25D366;
-}
+    .card {
+      background: linear-gradient(145deg, #ffffff, #f8f4ea);
+      color: #111;
+      border: 1px solid #e6dcc3;
+      border-radius: 20px;
+      padding: 24px;
+      text-align: left;
+      box-shadow: 0 14px 35px rgba(0,0,0,.12);
+      overflow: hidden;
+    }
 
-/* Ícones */
-.instagram::before {
-  content: "📸";
-}
+    .card h3 {
+      margin: 0 0 10px;
+      color: #17351f;
+      font-size: 22px;
+    }
 
-.facebook::before {
-  content: "f";
-  font-weight: bold;
-}
+    .card p {
+      line-height: 1.5;
+    }
 
-.whatsapp-social::before {
-  content: "💬";
-}
+    .price {
+      color: #8b6f2f;
+      font-size: 22px;
+      font-weight: bold;
+      margin: 10px 0;
+    }
 
-/* ================= FOOTER ================= */
-footer {
-  background: #0b0f14;
-  color: #ddd;
-  text-align: center;
-  padding: 30px;
-}
+    .card-image {
+      width: calc(100% + 48px);
+      height: 190px;
+      object-fit: cover;
+      margin: -24px -24px 18px;
+      border-bottom: 1px solid #e6dcc3;
+    }
 
-</style>
+    .whatsapp-btn {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 13px 16px;
+      background: #25D366;
+      color: white;
+      border-radius: 10px;
+      font-weight: bold;
+      transition: .2s ease;
+    }
+
+    .whatsapp-btn:hover {
+      filter: brightness(.95);
+    }
+
+    .empty-message {
+      color: inherit;
+      font-size: 17px;
+      margin: 20px auto 0;
+    }
+
+    /* ================= GALERIA ================= */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      max-width: 1050px;
+      margin: 34px auto 0;
+    }
+
+    .gallery img {
+      width: 100%;
+      height: 190px;
+      object-fit: cover;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.14);
+    }
+
+    /* ================= REDES SOCIAIS ================= */
+    .social-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin-top: 24px;
+    }
+
+    .social-links a {
+      width: 160px;
+      height: 60px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      color: white;
+      box-shadow: 0 8px 18px rgba(0,0,0,.15);
+      transition: .2s ease;
+    }
+
+    .social-links a:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 26px rgba(0,0,0,.25);
+    }
+
+    .instagram {
+      background: linear-gradient(135deg, #833AB4, #E1306C, #FCAF45);
+    }
+
+    .facebook {
+      background: #1877F2;
+    }
+
+    .whatsapp-social {
+      background: #25D366;
+    }
+
+    .instagram::before {
+      content: "📸";
+    }
+
+    .facebook::before {
+      content: "f";
+      font-weight: bold;
+    }
+
+    .whatsapp-social::before {
+      content: "💬";
+    }
+
+    /* ================= RODAPÉ ================= */
+    footer {
+      background: #0b0f14;
+      color: #ddd;
+      text-align: center;
+      padding: 34px 24px;
+      line-height: 1.7;
+    }
+
+    footer strong {
+      color: #ffffff;
+    }
+
+    /* ================= MOBILE ================= */
+    @media (max-width: 760px) {
+      .header {
+        padding: 9px 14px;
+      }
+
+      .brand span {
+        font-size: 14px;
+      }
+
+      .brand img {
+        width: 42px;
+        height: 42px;
+      }
+
+      .nav {
+        gap: 8px;
+        font-size: 12px;
+      }
+
+      .hero {
+        height: 45vh;
+        min-height: 280px;
+      }
+
+      .intro-cta {
+        padding: 38px 18px 48px;
+      }
+
+      .intro-cta p {
+        font-size: 17px;
+      }
+
+      .section {
+        padding: 54px 18px;
+      }
+
+      .gallery {
+        grid-template-columns: 1fr;
+        max-width: 420px;
+      }
+
+      .gallery img {
+        height: 170px;
+      }
+
+      .card-image {
+        height: 170px;
+      }
+
+      .social-links a {
+        width: 120px;
+        height: 54px;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .header {
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .nav {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 5px;
+      }
+
+      .brand span {
+        max-width: 120px;
+        line-height: 1.1;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<!-- ================= HEADER ================= -->
+<!-- ================= 3. TOPO / MENU ================= -->
 <header class="header">
   <div class="brand">
-    <img src="assets/images/icon.png">
-    Clube da Caminhonete
+    <img src="assets/images/icon.png" alt="Logo Clube da Caminhonete" />
+    <span>Clube da Caminhonete</span>
   </div>
 
   <nav class="nav">
-    <a href="#">Anúncios</a>
-    <a href="#">Eventos</a>
-    <a class="whatsapp-link" href="#">WhatsApp</a>
+    <a href="#anuncios">Anúncios</a>
+    <a href="#eventos">Eventos</a>
+    <a class="whatsapp-link" href="https://wa.me/5561991663179" target="_blank">WhatsApp</a>
   </nav>
 </header>
 
-<!-- ================= HERO ================= -->
-<section class="hero">
-  <img src="assets/images/icon.png">
-</section>
+<main>
 
-<!-- ================= INTRO ================= -->
-<section class="intro">
-  <h1>O Melhor Site de Carros Antigos do Brasil</h1>
-  <p>
-    Compre, venda e anuncie carros antigos, caminhonetes, motos e veículos clássicos com mais de 25 anos.
-  </p>
+  <!-- ================= 4. BANNER LIMPO ================= -->
+  <section class="hero"></section>
 
-  <a class="button" href="#">Anunciar veículo agora</a>
-</section>
+  <!-- ================= 5. CHAMADA PRINCIPAL ================= -->
+  <section class="intro-cta">
+    <h1>O Melhor Site de Carros Antigos do Brasil</h1>
+    <p>
+      Compre, venda e anuncie carros antigos, caminhonetes, motos e veículos clássicos com mais de 25 anos.
+    </p>
 
-<!-- ================= SOCIAL ================= -->
-<section class="section">
-  <h2>Acompanhe nossas mídias</h2>
-  <p>Divulgamos anúncios, eventos e novidades nas redes sociais.</p>
+    <a class="button" href="https://wa.me/5561991663179?text=Olá! Quero anunciar meu veículo clássico." target="_blank">
+      Anunciar veículo agora
+    </a>
+  </section>
 
-  <div class="social-links">
-    <a class="instagram" href="#"></a>
-    <a class="facebook" href="#"></a>
-    <a class="whatsapp-social" href="#"></a>
-  </div>
-</section>
+  <!-- ================= 6. CONTEÚDO DINÂMICO: ANÚNCIOS ================= -->
+  <section id="anuncios" class="section green">
+    <h2>Anúncios disponíveis</h2>
+    <p class="lead">Veículos clássicos aprovados pela plataforma.</p>
+    <div id="lista-anuncios" class="grid"></div>
+  </section>
 
-<!-- ================= FOOTER ================= -->
+  <!-- ================= 7. CONTEÚDO DINÂMICO: EVENTOS ================= -->
+  <section id="eventos" class="section cream">
+    <h2>Eventos próximos</h2>
+    <p class="lead">Encontros, exposições e eventos de veículos clássicos.</p>
+    <div id="lista-eventos" class="grid"></div>
+  </section>
+
+  <!-- ================= 8. CONTEÚDO FIXO: GALERIA ================= -->
+  <section class="section white">
+    <h2>Galeria de Clássicos</h2>
+    <p class="lead">Veículos antigos, restaurações, encontros e histórias sobre rodas.</p>
+
+    <div class="gallery">
+      <img src="assets/images/foto1.png" alt="Carro antigo clássico" />
+      <img src="assets/images/foto2.png" alt="Caminhonete antiga restaurada" />
+      <img src="assets/images/foto3.png" alt="Veículo clássico" />
+      <img src="assets/images/foto4.png" alt="Carro clássico no Brasil" />
+      <img src="assets/images/foto5.png" alt="Veículo antigo de coleção" />
+      <img src="assets/images/foto6.png" alt="Caminhonete clássica" />
+    </div>
+  </section>
+
+  <!-- ================= 9. CONTEÚDO FIXO: INSTITUCIONAL ================= -->
+  <section class="section cream">
+    <h2>Uma empresa para quem vive a paixão por clássicos</h2>
+    <p class="lead">
+      Aproximamos vendedores, compradores, colecionadores, lojas parceiras e entusiastas.
+    </p>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Anuncie seu clássico</h3>
+        <p>Divulgue veículos antigos para um público qualificado e apaixonado por clássicos.</p>
+      </div>
+
+      <div class="card">
+        <h3>Encontre raridades</h3>
+        <p>Busque carros, caminhonetes, motos e veículos especiais com mais de 25 anos.</p>
+      </div>
+
+      <div class="card">
+        <h3>Lojas parceiras</h3>
+        <p>Parceiros poderão ter lojas oficiais dentro da plataforma Clube da Caminhonete.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 10. CONTEÚDO FIXO: MÍDIAS SOCIAIS ================= -->
+  <section class="section white">
+    <h2>Acompanhe nossas mídias</h2>
+    <p class="lead">Divulgamos anúncios, eventos e novidades nas redes sociais.</p>
+
+    <div class="social-links">
+      <a class="instagram" href="https://www.instagram.com/clubedacaminhonete" target="_blank" aria-label="Instagram"></a>
+      <a class="facebook" href="https://www.facebook.com/clubedacaminhonete" target="_blank" aria-label="Facebook"></a>
+      <a class="whatsapp-social" href="https://wa.me/5561991663179" target="_blank" aria-label="WhatsApp"></a>
+    </div>
+  </section>
+
+</main>
+
+<!-- ================= 11. RODAPÉ ================= -->
 <footer>
-  Clube da Caminhonete<br>
-  O Melhor Site de Carros Antigos do Brasil<br>
+  <strong>Clube da Caminhonete</strong><br />
+  O Melhor Site de Carros Antigos do Brasil<br />
   Marketplace de veículos clássicos
 </footer>
+
+<!-- ================= 12. FIREBASE / BANCO DE DADOS ================= -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA9-eYhr2Bdadd4OWD17zIRszs3LrxeBc",
+    authDomain: "clube-da-caminhonete-be770.firebaseapp.com",
+    projectId: "clube-da-caminhonete-be770",
+    storageBucket: "clube-da-caminhonete-be770.firebasestorage.app",
+    messagingSenderId: "559157035885",
+    appId: "1:559157035885:web:dd265c86d0a3db6a6b9064"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  function limparTexto(valor) {
+    if (valor === undefined || valor === null) return "";
+    return String(valor)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function formatarPreco(valor) {
+    const numero = Number(valor || 0);
+
+    if (!numero) {
+      return "Valor sob consulta";
+    }
+
+    return numero.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
+  }
+
+  function criarCardAnuncio(anuncio) {
+    const titulo = limparTexto(anuncio.titulo || "Veículo clássico");
+    const marca = limparTexto(anuncio.marca);
+    const modelo = limparTexto(anuncio.modelo);
+    const ano = limparTexto(anuncio.ano);
+    const cidade = limparTexto(anuncio.cidade);
+    const estado = limparTexto(anuncio.estado);
+    const descricao = limparTexto(anuncio.descricao);
+    const imagem = limparTexto(anuncio.imagem || anuncio.foto || anuncio.imageUrl || "");
+
+    const card = document.createElement("article");
+    card.className = "card";
+
+    card.innerHTML = `
+      ${imagem ? `<img class="card-image" src="${imagem}" alt="${titulo}" loading="lazy">` : ""}
+      <h3>${titulo}</h3>
+      <p>${marca} ${modelo} ${ano ? "• " + ano : ""}</p>
+      <p class="price">${formatarPreco(anuncio.preco)}</p>
+      <p>${cidade}${cidade && estado ? " - " : ""}${estado}</p>
+      <p>${descricao}</p>
+      <a class="whatsapp-btn" href="https://wa.me/5561991663179?text=Olá! Tenho interesse no anúncio ${encodeURIComponent(titulo)}" target="_blank">
+        Tenho interesse pelo WhatsApp
+      </a>
+    `;
+
+    return card;
+  }
+
+  function criarCardEvento(evento) {
+    const titulo = limparTexto(evento.titulo || "Evento de veículos clássicos");
+    const data = limparTexto(evento.data);
+    const hora = limparTexto(evento.hora);
+    const local = limparTexto(evento.local);
+    const cidade = limparTexto(evento.cidade);
+    const estado = limparTexto(evento.estado);
+    const descricao = limparTexto(evento.descricao);
+    const telefone = limparTexto(evento.telefone || "5561991663179");
+    const imagem = limparTexto(evento.imagem || evento.foto || evento.imageUrl || "");
+
+    const card = document.createElement("article");
+    card.className = "card";
+
+    card.innerHTML = `
+      ${imagem ? `<img class="card-image" src="${imagem}" alt="${titulo}" loading="lazy">` : ""}
+      <h3>${titulo}</h3>
+      <p>📅 ${data}${hora ? " às " + hora : ""}</p>
+      <p>📍 ${local}${local && cidade ? " — " : ""}${cidade}${cidade && estado ? " - " : ""}${estado}</p>
+      <p>${descricao}</p>
+      <a class="whatsapp-btn" href="https://wa.me/${telefone}" target="_blank">
+        Falar sobre o evento
+      </a>
+    `;
+
+    return card;
+  }
+
+  async function carregarAnuncios() {
+    const container = document.getElementById("lista-anuncios");
+    container.innerHTML = `<p class="empty-message">Carregando anúncios...</p>`;
+
+    try {
+      const snapshot = await getDocs(collection(db, "anuncios"));
+      container.innerHTML = "";
+
+      let total = 0;
+
+      snapshot.forEach(doc => {
+        const anuncio = doc.data();
+
+        if (anuncio.status === "aprovado") {
+          container.appendChild(criarCardAnuncio(anuncio));
+          total++;
+        }
+      });
+
+      if (total === 0) {
+        container.innerHTML = `<p class="empty-message">Nenhum anúncio aprovado no momento.</p>`;
+      }
+    } catch (error) {
+      console.error("Erro ao carregar anúncios:", error);
+      container.innerHTML = `<p class="empty-message">Não foi possível carregar os anúncios agora.</p>`;
+    }
+  }
+
+  async function carregarEventos() {
+    const container = document.getElementById("lista-eventos");
+    container.innerHTML = `<p class="empty-message">Carregando eventos...</p>`;
+
+    try {
+      const snapshot = await getDocs(collection(db, "eventos"));
+      container.innerHTML = "";
+
+      let total = 0;
+
+      snapshot.forEach(doc => {
+        const evento = doc.data();
+
+        if (evento.status === "aprovado") {
+          container.appendChild(criarCardEvento(evento));
+          total++;
+        }
+      });
+
+      if (total === 0) {
+        container.innerHTML = `<p class="empty-message">Nenhum evento aprovado no momento.</p>`;
+      }
+    } catch (error) {
+      console.error("Erro ao carregar eventos:", error);
+      container.innerHTML = `<p class="empty-message">Não foi possível carregar os eventos agora.</p>`;
+    }
+  }
+
+  carregarAnuncios();
+  carregarEventos();
+</script>
 
 </body>
 </html>
