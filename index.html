@@ -25,6 +25,8 @@
       --bege: #EDE6D6;
       --dourado: #d9c48f;
       --branco: #ffffff;
+      --cinza-texto: #555;
+      --sombra: 0 14px 35px rgba(0, 0, 0, .12);
     }
 
     body {
@@ -43,19 +45,21 @@
       display: block;
     }
 
-    /* ================= TOPO ================= */
+    /* ================= 3. TOPO / MENU ================= */
     .header {
       position: fixed;
       top: 0;
+      left: 0;
       width: 100%;
       z-index: 20;
-      background: rgba(11,15,13,.96);
-      border-bottom: 1px solid rgba(237,230,214,.15);
+      background: rgba(11, 15, 13, .96);
+      border-bottom: 1px solid rgba(237, 230, 214, .15);
       padding: 10px 22px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 6px 20px rgba(0,0,0,.35);
+      gap: 16px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, .35);
     }
 
     .brand {
@@ -77,9 +81,11 @@
     .nav {
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 14px;
       font-weight: bold;
       font-size: 15px;
+      flex-wrap: wrap;
     }
 
     .nav a {
@@ -94,62 +100,83 @@
       color: #25D366 !important;
     }
 
-    /* ================= BANNER / HERO ================= */
+    /* ================= 4. HERO CENTRALIZADO E RESPONSIVO ================= */
     .hero {
-      height: 70vh;
-      min-height: 420px;
+      min-height: 70vh;
       margin-top: 74px;
+      padding: 72px 22px;
       display: flex;
       align-items: center;
-      padding: 40px;
+      justify-content: center;
+      text-align: center;
       background:
-        linear-gradient(90deg, rgba(11,15,13,0.92), rgba(11,15,13,0.55)),
+        linear-gradient(180deg, rgba(11, 15, 13, .88), rgba(11, 15, 13, .72)),
         url("assets/images/banner-principal.png");
       background-size: cover;
       background-position: center;
     }
 
     .hero-content {
-      max-width: 560px;
-      color: #fff;
+      max-width: 780px;
+      margin: 0 auto;
+      color: var(--branco);
     }
 
     .hero-content h1 {
-      font-size: clamp(32px, 5vw, 54px);
-      line-height: 1.1;
       margin: 0 0 16px;
-      color: #ffffff;
+      font-size: clamp(34px, 6vw, 58px);
+      line-height: 1.08;
+      color: var(--branco);
     }
 
     .hero-content p {
-      font-size: 18px;
+      max-width: 680px;
+      margin: 0 auto 26px;
       color: #d8d1bf;
-      margin: 0 0 22px;
+      font-size: clamp(16px, 2.5vw, 20px);
       line-height: 1.5;
     }
 
     .hero-actions {
       display: flex;
+      justify-content: center;
+      align-items: center;
       gap: 12px;
       flex-wrap: wrap;
     }
 
+    .button,
     .button-outline {
-      display: inline-block;
-      padding: 14px 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 14px 24px;
       border-radius: 12px;
-      border: 1px solid var(--verde-neon);
-      color: var(--verde-neon);
       font-weight: bold;
       transition: .2s ease;
+      text-align: center;
     }
 
+    .button {
+      background: var(--verde-neon);
+      color: #06100d;
+      box-shadow: 0 10px 24px rgba(63, 224, 161, .22);
+    }
+
+    .button-outline {
+      border: 1px solid var(--verde-neon);
+      color: var(--verde-neon);
+      background: rgba(11, 15, 13, .35);
+    }
+
+    .button:hover,
     .button-outline:hover {
-      background: rgba(63, 224, 161, .10);
       transform: translateY(-2px);
+      filter: brightness(1.04);
     }
 
-    /* ================= CHAMADA ABAIXO DO BANNER ================= */
+    /* ================= 5. CHAMADA ABAIXO DO BANNER ================= */
     .intro-cta {
       background: var(--preto);
       text-align: center;
@@ -159,36 +186,20 @@
 
     .intro-cta h1 {
       color: var(--bege);
-      font-size: clamp(32px, 5vw, 56px);
+      font-size: clamp(30px, 5vw, 52px);
       margin: 0 0 16px;
       line-height: 1.08;
     }
 
     .intro-cta p {
       max-width: 760px;
-      margin: 0 auto 26px;
+      margin: 0 auto;
       color: #d8d1bf;
-      font-size: 20px;
+      font-size: clamp(17px, 2.4vw, 20px);
       line-height: 1.5;
     }
 
-    .button {
-      display: inline-block;
-      padding: 15px 26px;
-      border-radius: 12px;
-      background: var(--verde-neon);
-      color: #06100d;
-      font-weight: bold;
-      box-shadow: 0 10px 24px rgba(63,224,161,.22);
-      transition: .2s ease;
-    }
-
-    .button:hover {
-      transform: translateY(-2px);
-      filter: brightness(1.04);
-    }
-
-    /* ================= SEÇÕES ================= */
+    /* ================= 6. SEÇÕES ================= */
     .section {
       padding: 68px 24px;
       text-align: center;
@@ -207,45 +218,52 @@
       color: white;
     }
 
-    .green h2 {
-      color: var(--dourado);
-    }
-
     h2 {
       font-size: clamp(28px, 4vw, 42px);
       color: #17351f;
       margin: 0 0 12px;
+      text-align: center;
+    }
+
+    .green h2 {
+      color: var(--dourado);
     }
 
     .lead {
       max-width: 760px;
       margin: 0 auto 34px;
-      color: #555;
+      color: var(--cinza-texto);
       line-height: 1.6;
       font-size: 17px;
+      text-align: center;
     }
 
     .green .lead {
       color: #e8e2cf;
     }
 
-    /* ================= CARDS ================= */
+    /* ================= 7. CARDS / ANÚNCIOS / EVENTOS ================= */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 22px;
+      width: 100%;
       max-width: 1150px;
       margin: 34px auto 0;
+      align-items: stretch;
+      justify-items: center;
     }
 
     .card {
+      width: 100%;
+      max-width: 370px;
       background: linear-gradient(145deg, #ffffff, #f8f4ea);
       color: #111;
       border: 1px solid #e6dcc3;
       border-radius: 20px;
       padding: 24px;
-      text-align: left;
-      box-shadow: 0 14px 35px rgba(0,0,0,.12);
+      text-align: center;
+      box-shadow: var(--sombra);
       overflow: hidden;
     }
 
@@ -253,10 +271,13 @@
       margin: 0 0 10px;
       color: #17351f;
       font-size: 22px;
+      text-align: center;
     }
 
     .card p {
       line-height: 1.5;
+      margin: 8px 0;
+      text-align: center;
     }
 
     .price {
@@ -264,6 +285,7 @@
       font-size: 22px;
       font-weight: bold;
       margin: 10px 0;
+      text-align: center;
     }
 
     .card-image {
@@ -275,7 +297,9 @@
     }
 
     .whatsapp-btn {
-      display: inline-block;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
       margin-top: 12px;
       padding: 13px 16px;
       background: #25D366;
@@ -283,25 +307,31 @@
       border-radius: 10px;
       font-weight: bold;
       transition: .2s ease;
+      text-align: center;
     }
 
     .whatsapp-btn:hover {
       filter: brightness(.95);
+      transform: translateY(-1px);
     }
 
     .empty-message {
+      grid-column: 1 / -1;
       color: inherit;
       font-size: 17px;
       margin: 20px auto 0;
+      text-align: center;
     }
 
-    /* ================= GALERIA ================= */
+    /* ================= 8. GALERIA ================= */
     .gallery {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 18px;
+      width: 100%;
       max-width: 1050px;
       margin: 34px auto 0;
+      justify-items: center;
     }
 
     .gallery img {
@@ -309,13 +339,14 @@
       height: 190px;
       object-fit: cover;
       border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,.14);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, .14);
     }
 
-    /* ================= REDES SOCIAIS ================= */
+    /* ================= 9. REDES SOCIAIS ================= */
     .social-links {
       display: flex;
       justify-content: center;
+      align-items: center;
       flex-wrap: wrap;
       gap: 18px;
       margin-top: 24px;
@@ -325,19 +356,19 @@
       width: 58px;
       height: 58px;
       border-radius: 50%;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       font-size: 25px;
       color: white;
-      box-shadow: 0 8px 18px rgba(0,0,0,.15);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, .15);
       transition: .2s ease;
       font-weight: bold;
     }
 
     .social-links a:hover {
       transform: translateY(-3px);
-      box-shadow: 0 12px 26px rgba(0,0,0,.25);
+      box-shadow: 0 12px 26px rgba(0, 0, 0, .25);
     }
 
     .instagram {
@@ -366,7 +397,7 @@
       content: "☎";
     }
 
-    /* ================= BOTÃO FIXO WHATSAPP ================= */
+    /* ================= 10. BOTÃO FIXO WHATSAPP ================= */
     .whatsapp-fixo {
       position: fixed;
       right: 18px;
@@ -377,11 +408,11 @@
       width: 62px;
       height: 62px;
       border-radius: 50%;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       font-size: 30px;
-      box-shadow: 0 10px 28px rgba(0,0,0,.35);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, .35);
       transition: .2s ease;
     }
 
@@ -394,7 +425,7 @@
       content: "☎";
     }
 
-    /* ================= RODAPÉ ================= */
+    /* ================= 11. RODAPÉ ================= */
     footer {
       background: #0b0f14;
       color: #ddd;
@@ -407,7 +438,7 @@
       color: #ffffff;
     }
 
-    /* ================= MOBILE ================= */
+    /* ================= 12. MOBILE ================= */
     @media (max-width: 760px) {
       .header {
         padding: 9px 14px;
@@ -428,27 +459,37 @@
       }
 
       .hero {
-        height: auto;
-        min-height: 360px;
+        min-height: 420px;
         margin-top: 64px;
+        padding: 54px 20px;
         background-position: center;
-        padding: 44px 20px;
       }
 
       .hero-content h1 {
-        font-size: 32px;
+        font-size: 34px;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+      }
+
+      .button,
+      .button-outline {
+        width: 100%;
+        max-width: 280px;
       }
 
       .intro-cta {
         padding: 38px 18px 48px;
       }
 
-      .intro-cta p {
-        font-size: 17px;
-      }
-
       .section {
         padding: 54px 18px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+        max-width: 430px;
       }
 
       .gallery {
@@ -480,8 +521,13 @@
 
     @media (max-width: 430px) {
       .header {
-        align-items: flex-start;
+        align-items: center;
         gap: 8px;
+      }
+
+      .brand span {
+        max-width: 118px;
+        line-height: 1.1;
       }
 
       .nav {
@@ -490,312 +536,297 @@
         gap: 5px;
       }
 
-      .brand span {
-        max-width: 120px;
-        line-height: 1.1;
+      .hero-content h1 {
+        font-size: 31px;
       }
     }
   </style>
 </head>
 
 <body>
-
-<!-- ================= 3. TOPO / MENU ================= -->
-<header class="header">
-  <div class="brand">
-    <img src="assets/images/logo-principal.png" alt="Clube da Caminhonete" />
-    <span>Clube da Caminhonete</span>
-  </div>
-
-  <nav class="nav">
-    <a href="#anuncios">Anúncios</a>
-    <a href="#eventos">Eventos</a>
-    <a class="whatsapp-link" href="https://wa.me/5561991663179" target="_blank">WhatsApp</a>
-  </nav>
-</header>
-
-<main>
-
-  <!-- ================= 4. HERO NOVO (VENDEDOR) ================= -->
-  <section class="hero">
-  <div style="max-width: 520px; color: #fff;">
-    
-    <h1 style="font-size: clamp(32px, 5vw, 54px); line-height: 1.1; margin-bottom: 16px;">
-      O melhor site de carros antigos do Brasil
-    </h1>
-
-    <p style="font-size: 18px; color: #d8d1bf; margin-bottom: 22px;">
-      Compre, venda e anuncie caminhonetes, motos e veículos clássicos com mais de 25 anos.
-    </p>
-
-    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-      
-      <a class="button" href="https://wa.me/5561991663179?text=Quero anunciar meu veículo" target="_blank">
-        Anunciar agora
-      </a>
-
-      <a style="
-        padding: 14px 22px;
-        border-radius: 12px;
-        border: 1px solid #3FE0A1;
-        color: #3FE0A1;
-        font-weight: bold;
-      " href="#anuncios">
-        Ver anúncios
-      </a>
-
+  <!-- ================= 3. TOPO / MENU ================= -->
+  <header class="header">
+    <div class="brand">
+      <img src="assets/images/logo-principal.png" alt="Clube da Caminhonete" />
+      <span>Clube da Caminhonete</span>
     </div>
 
-  </div>
-</section>
-  <!-- ================= 5. BLOCO DE CONFIANÇA ================= -->
-  <section class="intro-cta">
-    <h1>Negocie veículos clássicos com segurança</h1>
+    <nav class="nav">
+      <a href="#anuncios">Anúncios</a>
+      <a href="#eventos">Eventos</a>
+      <a class="whatsapp-link" href="https://wa.me/5561991663179" target="_blank">WhatsApp</a>
+    </nav>
+  </header>
 
-    <p>
-      Plataforma dedicada a carros antigos, caminhonetes e motos com mais de 25 anos.
-      Público qualificado, anúncios aprovados e alto alcance.
-    </p>
-  </section>
+  <main>
+    <!-- ================= 4. HERO CENTRALIZADO RESPONSIVO ================= -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1>O melhor site de carros antigos do Brasil</h1>
 
-  <!-- ================= 6. CONTEÚDO DINÂMICO: ANÚNCIOS ================= -->
-  <section id="anuncios" class="section green">
-    <h2>Anúncios disponíveis</h2>
-    <p class="lead">Veículos clássicos aprovados pela plataforma.</p>
-    <div id="lista-anuncios" class="grid"></div>
-  </section>
+        <p>
+          Compre, venda e anuncie caminhonetes, motos e veículos clássicos com mais de 25 anos.
+        </p>
 
-  <!-- ================= 7. CONTEÚDO DINÂMICO: EVENTOS ================= -->
-  <section id="eventos" class="section cream">
-    <h2>Eventos próximos</h2>
-    <p class="lead">Encontros, exposições e eventos de veículos clássicos.</p>
-    <div id="lista-eventos" class="grid"></div>
-  </section>
+        <div class="hero-actions">
+          <a class="button" href="https://wa.me/5561991663179?text=Quero anunciar meu veículo" target="_blank">
+            Anunciar agora
+          </a>
 
-  <!-- ================= 8. CONTEÚDO FIXO: GALERIA ================= -->
-  <section class="section white">
-    <h2>Galeria de Clássicos</h2>
-    <p class="lead">Veículos antigos, restaurações, encontros e histórias sobre rodas.</p>
-
-    <div class="gallery">
-      <img src="assets/images/foto1.png" alt="Carro antigo clássico" />
-      <img src="assets/images/foto2.png" alt="Caminhonete antiga restaurada" />
-      <img src="assets/images/foto3.png" alt="Veículo clássico" />
-      <img src="assets/images/foto4.png" alt="Carro clássico no Brasil" />
-      <img src="assets/images/foto5.png" alt="Veículo antigo de coleção" />
-      <img src="assets/images/foto6.png" alt="Caminhonete clássica" />
-    </div>
-  </section>
-
-  <!-- ================= 9. CONTEÚDO FIXO: INSTITUCIONAL ================= -->
-  <section class="section cream">
-    <h2>Uma empresa para quem vive a paixão por clássicos</h2>
-    <p class="lead">
-      Aproximamos vendedores, compradores, colecionadores, lojas parceiras e entusiastas.
-    </p>
-
-    <div class="grid">
-      <div class="card">
-        <h3>Anuncie seu clássico</h3>
-        <p>Divulgue veículos antigos para um público qualificado e apaixonado por clássicos.</p>
+          <a class="button-outline" href="#anuncios">
+            Ver anúncios
+          </a>
+        </div>
       </div>
+    </section>
 
-      <div class="card">
-        <h3>Encontre raridades</h3>
-        <p>Busque carros, caminhonetes, motos e veículos especiais com mais de 25 anos.</p>
+    <!-- ================= 5. BLOCO DE CONFIANÇA ================= -->
+    <section class="intro-cta">
+      <h1>Negocie veículos clássicos com segurança</h1>
+
+      <p>
+        Plataforma dedicada a carros antigos, caminhonetes e motos com mais de 25 anos.
+        Público qualificado, anúncios aprovados e alto alcance.
+      </p>
+    </section>
+
+    <!-- ================= 6. CONTEÚDO DINÂMICO: ANÚNCIOS ================= -->
+    <section id="anuncios" class="section green">
+      <h2>Anúncios disponíveis</h2>
+      <p class="lead">Veículos clássicos aprovados pela plataforma.</p>
+      <div id="lista-anuncios" class="grid"></div>
+    </section>
+
+    <!-- ================= 7. CONTEÚDO DINÂMICO: EVENTOS ================= -->
+    <section id="eventos" class="section cream">
+      <h2>Eventos próximos</h2>
+      <p class="lead">Encontros, exposições e eventos de veículos clássicos.</p>
+      <div id="lista-eventos" class="grid"></div>
+    </section>
+
+    <!-- ================= 8. CONTEÚDO FIXO: GALERIA ================= -->
+    <section class="section white">
+      <h2>Galeria de Clássicos</h2>
+      <p class="lead">Veículos antigos, restaurações, encontros e histórias sobre rodas.</p>
+
+      <div class="gallery">
+        <img src="assets/images/foto1.png" alt="Carro antigo clássico" />
+        <img src="assets/images/foto2.png" alt="Caminhonete antiga restaurada" />
+        <img src="assets/images/foto3.png" alt="Veículo clássico" />
+        <img src="assets/images/foto4.png" alt="Carro clássico no Brasil" />
+        <img src="assets/images/foto5.png" alt="Veículo antigo de coleção" />
+        <img src="assets/images/foto6.png" alt="Caminhonete clássica" />
       </div>
+    </section>
 
-      <div class="card">
-        <h3>Lojas parceiras</h3>
-        <p>Parceiros poderão ter lojas oficiais dentro da plataforma Clube da Caminhonete.</p>
+    <!-- ================= 9. CONTEÚDO FIXO: INSTITUCIONAL ================= -->
+    <section class="section cream">
+      <h2>Uma empresa para quem vive a paixão por clássicos</h2>
+      <p class="lead">
+        Aproximamos vendedores, compradores, colecionadores, lojas parceiras e entusiastas.
+      </p>
+
+      <div class="grid">
+        <div class="card">
+          <h3>Anuncie seu clássico</h3>
+          <p>Divulgue veículos antigos para um público qualificado e apaixonado por clássicos.</p>
+        </div>
+
+        <div class="card">
+          <h3>Encontre raridades</h3>
+          <p>Busque carros, caminhonetes, motos e veículos especiais com mais de 25 anos.</p>
+        </div>
+
+        <div class="card">
+          <h3>Lojas parceiras</h3>
+          <p>Parceiros poderão ter lojas oficiais dentro da plataforma Clube da Caminhonete.</p>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ================= 10. CONTEÚDO FIXO: MÍDIAS SOCIAIS ================= -->
-  <section class="section white">
-    <h2>Acompanhe nossas mídias</h2>
-    <p class="lead">Divulgamos anúncios, eventos e novidades nas redes sociais.</p>
+    <!-- ================= 10. CONTEÚDO FIXO: MÍDIAS SOCIAIS ================= -->
+    <section class="section white">
+      <h2>Acompanhe nossas mídias</h2>
+      <p class="lead">Divulgamos anúncios, eventos e novidades nas redes sociais.</p>
 
-    <div class="social-links">
-      <a class="instagram" href="https://www.instagram.com/clubedacaminhonete" target="_blank" aria-label="Instagram"></a>
-      <a class="facebook" href="https://www.facebook.com/clubedacaminhonete" target="_blank" aria-label="Facebook"></a>
-      <a class="whatsapp-social" href="https://wa.me/5561991663179" target="_blank" aria-label="WhatsApp"></a>
-    </div>
-  </section>
+      <div class="social-links">
+        <a class="instagram" href="https://www.instagram.com/clubedacaminhonete" target="_blank" aria-label="Instagram"></a>
+        <a class="facebook" href="https://www.facebook.com/clubedacaminhonete" target="_blank" aria-label="Facebook"></a>
+        <a class="whatsapp-social" href="https://wa.me/5561991663179" target="_blank" aria-label="WhatsApp"></a>
+      </div>
+    </section>
+  </main>
 
-</main>
+  <!-- ================= 11. RODAPÉ ================= -->
+  <footer>
+    <strong>Clube da Caminhonete</strong><br />
+    O Melhor Site de Carros Antigos do Brasil<br />
+    Marketplace de veículos clássicos
+  </footer>
 
-<!-- ================= 11. RODAPÉ ================= -->
-<footer>
-  <strong>Clube da Caminhonete</strong><br />
-  O Melhor Site de Carros Antigos do Brasil<br />
-  Marketplace de veículos clássicos
-</footer>
+  <!-- ================= BOTÃO FIXO WHATSAPP ================= -->
+  <a
+    class="whatsapp-fixo"
+    href="https://wa.me/5561991663179?text=Olá! Vim pelo site Clube da Caminhonete."
+    target="_blank"
+    aria-label="Falar no WhatsApp"
+  ></a>
 
-<!-- ================= BOTÃO FIXO WHATSAPP ================= -->
-<a
-  class="whatsapp-fixo"
-  href="https://wa.me/5561991663179?text=Olá! Vim pelo site Clube da Caminhonete."
-  target="_blank"
-  aria-label="Falar no WhatsApp"
-></a>
+  <!-- ================= 12. FIREBASE / BANCO DE DADOS ================= -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
-<!-- ================= 12. FIREBASE / BANCO DE DADOS ================= -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+    const firebaseConfig = {
+      apiKey: "AIzaSyA9-eYhr2Bdadd4OWD17zIRszs3LrxeBc",
+      authDomain: "clube-da-caminhonete-be770.firebaseapp.com",
+      projectId: "clube-da-caminhonete-be770",
+      storageBucket: "clube-da-caminhonete-be770.firebasestorage.app",
+      messagingSenderId: "559157035885",
+      appId: "1:559157035885:web:dd265c86d0a3db6a6b9064"
+    };
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyA9-eYhr2Bdadd4OWD17zIRszs3LrxeBc",
-    authDomain: "clube-da-caminhonete-be770.firebaseapp.com",
-    projectId: "clube-da-caminhonete-be770",
-    storageBucket: "clube-da-caminhonete-be770.firebasestorage.app",
-    messagingSenderId: "559157035885",
-    appId: "1:559157035885:web:dd265c86d0a3db6a6b9064"
-  };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+    function limparTexto(valor) {
+      if (valor === undefined || valor === null) return "";
 
-  function limparTexto(valor) {
-    if (valor === undefined || valor === null) return "";
-    return String(valor)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
-
-  function formatarPreco(valor) {
-    const numero = Number(valor || 0);
-
-    if (!numero) {
-      return "Valor sob consulta";
+      return String(valor)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
 
-    return numero.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL"
-    });
-  }
+    function formatarPreco(valor) {
+      const numero = Number(valor || 0);
 
-  function criarCardAnuncio(anuncio) {
-    const titulo = limparTexto(anuncio.titulo || "Veículo clássico");
-    const marca = limparTexto(anuncio.marca);
-    const modelo = limparTexto(anuncio.modelo);
-    const ano = limparTexto(anuncio.ano);
-    const cidade = limparTexto(anuncio.cidade);
-    const estado = limparTexto(anuncio.estado);
-    const descricao = limparTexto(anuncio.descricao);
-    const imagem = limparTexto(anuncio.imagem || anuncio.foto || anuncio.imageUrl || "");
-
-    const card = document.createElement("article");
-    card.className = "card";
-
-    card.innerHTML = `
-      ${imagem ? `<img class="card-image" src="${imagem}" alt="${titulo}" loading="lazy">` : ""}
-      <h3>${titulo}</h3>
-      <p>${marca} ${modelo} ${ano ? "• " + ano : ""}</p>
-      <p class="price">${formatarPreco(anuncio.preco)}</p>
-      <p>${cidade}${cidade && estado ? " - " : ""}${estado}</p>
-      <p>${descricao}</p>
-      <a class="whatsapp-btn" href="https://wa.me/5561991663179?text=Olá! Tenho interesse no anúncio ${encodeURIComponent(titulo)}" target="_blank">
-        Tenho interesse pelo WhatsApp
-      </a>
-    `;
-
-    return card;
-  }
-
-  function criarCardEvento(evento) {
-    const titulo = limparTexto(evento.titulo || "Evento de veículos clássicos");
-    const data = limparTexto(evento.data);
-    const hora = limparTexto(evento.hora);
-    const local = limparTexto(evento.local);
-    const cidade = limparTexto(evento.cidade);
-    const estado = limparTexto(evento.estado);
-    const descricao = limparTexto(evento.descricao);
-    const telefone = limparTexto(evento.telefone || "5561991663179");
-    const imagem = limparTexto(evento.imagem || evento.foto || evento.imageUrl || "");
-
-    const card = document.createElement("article");
-    card.className = "card";
-
-    card.innerHTML = `
-      ${imagem ? `<img class="card-image" src="${imagem}" alt="${titulo}" loading="lazy">` : ""}
-      <h3>${titulo}</h3>
-      <p>📅 ${data}${hora ? " às " + hora : ""}</p>
-      <p>📍 ${local}${local && cidade ? " — " : ""}${cidade}${cidade && estado ? " - " : ""}${estado}</p>
-      <p>${descricao}</p>
-      <a class="whatsapp-btn" href="https://wa.me/${telefone}" target="_blank">
-        Falar sobre o evento
-      </a>
-    `;
-
-    return card;
-  }
-
-  async function carregarAnuncios() {
-    const container = document.getElementById("lista-anuncios");
-    container.innerHTML = `<p class="empty-message">Carregando anúncios...</p>`;
-
-    try {
-      const snapshot = await getDocs(collection(db, "anuncios"));
-      container.innerHTML = "";
-
-      let total = 0;
-
-      snapshot.forEach(doc => {
-        const anuncio = doc.data();
-
-        if (anuncio.status === "aprovado") {
-          container.appendChild(criarCardAnuncio(anuncio));
-          total++;
-        }
-      });
-
-      if (total === 0) {
-        container.innerHTML = `<p class="empty-message">Nenhum anúncio aprovado no momento.</p>`;
+      if (!numero) {
+        return "Valor sob consulta";
       }
-    } catch (error) {
-      console.error("Erro ao carregar anúncios:", error);
-      container.innerHTML = `<p class="empty-message">Não foi possível carregar os anúncios agora.</p>`;
-    }
-  }
 
-  async function carregarEventos() {
-    const container = document.getElementById("lista-eventos");
-    container.innerHTML = `<p class="empty-message">Carregando eventos...</p>`;
-
-    try {
-      const snapshot = await getDocs(collection(db, "eventos"));
-      container.innerHTML = "";
-
-      let total = 0;
-
-      snapshot.forEach(doc => {
-        const evento = doc.data();
-
-        if (evento.status === "aprovado") {
-          container.appendChild(criarCardEvento(evento));
-          total++;
-        }
+      return numero.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
       });
-
-      if (total === 0) {
-        container.innerHTML = `<p class="empty-message">Nenhum evento aprovado no momento.</p>`;
-      }
-    } catch (error) {
-      console.error("Erro ao carregar eventos:", error);
-      container.innerHTML = `<p class="empty-message">Não foi possível carregar os eventos agora.</p>`;
     }
-  }
 
-  carregarAnuncios();
-  carregarEventos();
-</script>
+    function criarCardAnuncio(anuncio) {
+      const titulo = limparTexto(anuncio.titulo || "Veículo clássico");
+      const marca = limparTexto(anuncio.marca);
+      const modelo = limparTexto(anuncio.modelo);
+      const ano = limparTexto(anuncio.ano);
+      const cidade = limparTexto(anuncio.cidade);
+      const estado = limparTexto(anuncio.estado);
+      const descricao = limparTexto(anuncio.descricao);
+      const imagem = limparTexto(anuncio.imagem || anuncio.foto || anuncio.imageUrl || "");
 
+      const card = document.createElement("article");
+      card.className = "card";
+
+      card.innerHTML = `
+        ${imagem ? `<img class="card-image" src="${imagem}" alt="${titulo}" loading="lazy">` : ""}
+        <h3>${titulo}</h3>
+        <p>${marca} ${modelo} ${ano ? "• " + ano : ""}</p>
+        <p class="price">${formatarPreco(anuncio.preco)}</p>
+        <p>${cidade}${cidade && estado ? " - " : ""}${estado}</p>
+        <p>${descricao}</p>
+        <a class="whatsapp-btn" href="https://wa.me/5561991663179?text=Olá! Tenho interesse no anúncio ${encodeURIComponent(titulo)}" target="_blank">
+          Tenho interesse pelo WhatsApp
+        </a>
+      `;
+
+      return card;
+    }
+
+    function criarCardEvento(evento) {
+      const titulo = limparTexto(evento.titulo || "Evento de veículos clássicos");
+      const data = limparTexto(evento.data);
+      const hora = limparTexto(evento.hora);
+      const local = limparTexto(evento.local);
+      const cidade = limparTexto(evento.cidade);
+      const estado = limparTexto(evento.estado);
+      const descricao = limparTexto(evento.descricao);
+      const telefone = limparTexto(evento.telefone || "5561991663179");
+      const imagem = limparTexto(evento.imagem || evento.foto || evento.imageUrl || "");
+
+      const card = document.createElement("article");
+      card.className = "card";
+
+      card.innerHTML = `
+        ${imagem ? `<img class="card-image" src="${imagem}" alt="${titulo}" loading="lazy">` : ""}
+        <h3>${titulo}</h3>
+        <p>📅 ${data}${hora ? " às " + hora : ""}</p>
+        <p>📍 ${local}${local && cidade ? " — " : ""}${cidade}${cidade && estado ? " - " : ""}${estado}</p>
+        <p>${descricao}</p>
+        <a class="whatsapp-btn" href="https://wa.me/${telefone}" target="_blank">
+          Falar sobre o evento
+        </a>
+      `;
+
+      return card;
+    }
+
+    async function carregarAnuncios() {
+      const container = document.getElementById("lista-anuncios");
+      container.innerHTML = `<p class="empty-message">Carregando anúncios...</p>`;
+
+      try {
+        const snapshot = await getDocs(collection(db, "anuncios"));
+        container.innerHTML = "";
+
+        let total = 0;
+
+        snapshot.forEach(doc => {
+          const anuncio = doc.data();
+
+          if (anuncio.status === "aprovado") {
+            container.appendChild(criarCardAnuncio(anuncio));
+            total++;
+          }
+        });
+
+        if (total === 0) {
+          container.innerHTML = `<p class="empty-message">Nenhum anúncio aprovado no momento.</p>`;
+        }
+      } catch (error) {
+        console.error("Erro ao carregar anúncios:", error);
+        container.innerHTML = `<p class="empty-message">Não foi possível carregar os anúncios agora.</p>`;
+      }
+    }
+
+    async function carregarEventos() {
+      const container = document.getElementById("lista-eventos");
+      container.innerHTML = `<p class="empty-message">Carregando eventos...</p>`;
+
+      try {
+        const snapshot = await getDocs(collection(db, "eventos"));
+        container.innerHTML = "";
+
+        let total = 0;
+
+        snapshot.forEach(doc => {
+          const evento = doc.data();
+
+          if (evento.status === "aprovado") {
+            container.appendChild(criarCardEvento(evento));
+            total++;
+          }
+        });
+
+        if (total === 0) {
+          container.innerHTML = `<p class="empty-message">Nenhum evento aprovado no momento.</p>`;
+        }
+      } catch (error) {
+        console.error("Erro ao carregar eventos:", error);
+        container.innerHTML = `<p class="empty-message">Não foi possível carregar os eventos agora.</p>`;
+      }
+    }
+
+    carregarAnuncios();
+    carregarEventos();
+  </script>
 </body>
 </html>
