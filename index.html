@@ -94,23 +94,60 @@
       color: #25D366 !important;
     }
 
-    /* ================= BANNER LIMPO ================= */
-.hero {
-  height: 70vh;
-  min-height: 420px;
-  margin-top: 74px;
+    /* ================= BANNER / HERO ================= */
+    .hero {
+      height: 70vh;
+      min-height: 420px;
+      margin-top: 74px;
+      display: flex;
+      align-items: center;
+      padding: 40px;
+      background:
+        linear-gradient(90deg, rgba(11,15,13,0.92), rgba(11,15,13,0.55)),
+        url("assets/images/banner-principal.png");
+      background-size: cover;
+      background-position: center;
+    }
 
-  display: flex;
-  align-items: center;
-  padding: 40px;
+    .hero-content {
+      max-width: 560px;
+      color: #fff;
+    }
 
-  background:
-    linear-gradient(90deg, rgba(11,15,13,0.92), rgba(11,15,13,0.55)),
-    url("assets/images/banner-principal.png");
+    .hero-content h1 {
+      font-size: clamp(32px, 5vw, 54px);
+      line-height: 1.1;
+      margin: 0 0 16px;
+      color: #ffffff;
+    }
 
-  background-size: cover;
-  background-position: center;
-}
+    .hero-content p {
+      font-size: 18px;
+      color: #d8d1bf;
+      margin: 0 0 22px;
+      line-height: 1.5;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .button-outline {
+      display: inline-block;
+      padding: 14px 22px;
+      border-radius: 12px;
+      border: 1px solid var(--verde-neon);
+      color: var(--verde-neon);
+      font-weight: bold;
+      transition: .2s ease;
+    }
+
+    .button-outline:hover {
+      background: rgba(63, 224, 161, .10);
+      transform: translateY(-2px);
+    }
 
     /* ================= CHAMADA ABAIXO DO BANNER ================= */
     .intro-cta {
@@ -285,16 +322,17 @@
     }
 
     .social-links a {
-      width: 160px;
-      height: 60px;
-      border-radius: 14px;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 26px;
+      font-size: 25px;
       color: white;
       box-shadow: 0 8px 18px rgba(0,0,0,.15);
       transition: .2s ease;
+      font-weight: bold;
     }
 
     .social-links a:hover {
@@ -308,6 +346,8 @@
 
     .facebook {
       background: #1877F2;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 31px !important;
     }
 
     .whatsapp-social {
@@ -315,16 +355,43 @@
     }
 
     .instagram::before {
-      content: "📸";
+      content: "◎";
     }
 
     .facebook::before {
       content: "f";
-      font-weight: bold;
     }
 
     .whatsapp-social::before {
-      content: "💬";
+      content: "☎";
+    }
+
+    /* ================= BOTÃO FIXO WHATSAPP ================= */
+    .whatsapp-fixo {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 50;
+      background: #25D366;
+      color: white;
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      box-shadow: 0 10px 28px rgba(0,0,0,.35);
+      transition: .2s ease;
+    }
+
+    .whatsapp-fixo:hover {
+      transform: scale(1.06);
+      filter: brightness(.95);
+    }
+
+    .whatsapp-fixo::before {
+      content: "☎";
     }
 
     /* ================= RODAPÉ ================= */
@@ -361,10 +428,15 @@
       }
 
       .hero {
-        height: 45vh;
-        min-height: 300px;
+        height: auto;
+        min-height: 360px;
         margin-top: 64px;
         background-position: center;
+        padding: 44px 20px;
+      }
+
+      .hero-content h1 {
+        font-size: 32px;
       }
 
       .intro-cta {
@@ -393,8 +465,16 @@
       }
 
       .social-links a {
-        width: 120px;
-        height: 54px;
+        width: 52px;
+        height: 52px;
+      }
+
+      .whatsapp-fixo {
+        width: 56px;
+        height: 56px;
+        right: 14px;
+        bottom: 14px;
+        font-size: 27px;
       }
     }
 
@@ -436,19 +516,35 @@
 
 <main>
 
-  <!-- ================= 4. BANNER LIMPO ================= -->
-  <section class="hero"></section>
+  <!-- ================= 4. HERO NOVO (VENDEDOR) ================= -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>O maior marketplace de caminhonetes e clássicos do Brasil</h1>
 
-  <!-- ================= 5. CHAMADA PRINCIPAL ================= -->
+      <p>
+        Compre, venda e anuncie veículos com mais de 25 anos com segurança e visibilidade nacional.
+      </p>
+
+      <div class="hero-actions">
+        <a class="button" href="https://wa.me/5561991663179?text=Quero anunciar meu veículo" target="_blank">
+          Anunciar agora
+        </a>
+
+        <a class="button-outline" href="#anuncios">
+          Ver anúncios
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 5. BLOCO DE CONFIANÇA ================= -->
   <section class="intro-cta">
-    <h1>O Melhor Site de Carros Antigos do Brasil</h1>
-    <p>
-      Compre, venda e anuncie carros antigos, caminhonetes, motos e veículos clássicos com mais de 25 anos.
-    </p>
+    <h1>Negocie veículos clássicos com segurança</h1>
 
-    <a class="button" href="https://wa.me/5561991663179?text=Olá! Quero anunciar meu veículo clássico." target="_blank">
-      Anunciar veículo agora
-    </a>
+    <p>
+      Plataforma dedicada a carros antigos, caminhonetes e motos com mais de 25 anos.
+      Público qualificado, anúncios aprovados e alto alcance.
+    </p>
   </section>
 
   <!-- ================= 6. CONTEÚDO DINÂMICO: ANÚNCIOS ================= -->
@@ -525,6 +621,14 @@
   O Melhor Site de Carros Antigos do Brasil<br />
   Marketplace de veículos clássicos
 </footer>
+
+<!-- ================= BOTÃO FIXO WHATSAPP ================= -->
+<a
+  class="whatsapp-fixo"
+  href="https://wa.me/5561991663179?text=Olá! Vim pelo site Clube da Caminhonete."
+  target="_blank"
+  aria-label="Falar no WhatsApp"
+></a>
 
 <!-- ================= 12. FIREBASE / BANCO DE DADOS ================= -->
 <script type="module">

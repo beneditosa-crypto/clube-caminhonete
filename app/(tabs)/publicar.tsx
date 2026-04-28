@@ -1,4 +1,4 @@
-import { anuncios } from "./dados";
+import { anuncios } from "../dados";
 import { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from "react-native";
 
