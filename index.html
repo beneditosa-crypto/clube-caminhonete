@@ -7,7 +7,7 @@
 
   <title>Clube da Caminhonete | Carros Antigos, Caminhonetes e Clássicos</title>
 
-  <meta name="description" content="Compre, venda e anuncie carros antigos, caminhonetes, motos e veículos clássicos com mais de 25 anos." />
+  <meta name="description" content="O melhor site de carros antigos do Brasil. Compre, venda e anuncie carros antigos, caminhonetes, motos e veículos clássicos com mais de 25 anos." />
   <meta name="keywords" content="carros antigos, veículos clássicos, caminhonetes antigas, motos antigas, anunciar carro antigo" />
   <meta name="robots" content="index, follow" />
 
@@ -97,10 +97,19 @@
     }
 
     .whatsapp-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       color: #25D366 !important;
     }
 
-    /* ================= 4. HERO CENTRALIZADO E RESPONSIVO ================= */
+    .whatsapp-link svg {
+      width: 22px;
+      height: 22px;
+      fill: #25D366;
+    }
+
+    /* ================= 4. HERO CENTRALIZADO RESPONSIVO ================= */
     .hero {
       min-height: 70vh;
       margin-top: 74px;
@@ -176,7 +185,94 @@
       filter: brightness(1.04);
     }
 
-    /* ================= 5. CHAMADA ABAIXO DO BANNER ================= */
+    /* ================= 5. BUSCA DE ANÚNCIOS ================= */
+    .search-section {
+      background: #f4f1e8;
+      padding: 34px 20px;
+      text-align: center;
+    }
+
+    .search-box {
+      max-width: 1080px;
+      margin: -72px auto 0;
+      position: relative;
+      z-index: 5;
+      background: #ffffff;
+      border: 1px solid #e6dcc3;
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, .20);
+    }
+
+    .search-box h2 {
+      margin: 0 0 8px;
+      color: #17351f;
+      font-size: clamp(24px, 4vw, 34px);
+    }
+
+    .search-box p {
+      margin: 0 auto 22px;
+      color: var(--cinza-texto);
+      line-height: 1.5;
+    }
+
+    .search-fields {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(160px, 1fr));
+      gap: 12px;
+      align-items: end;
+    }
+
+    .field {
+      text-align: left;
+    }
+
+    .field label {
+      display: block;
+      margin: 0 0 7px;
+      color: #17351f;
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      height: 48px;
+      border: 1px solid #d8cfba;
+      border-radius: 12px;
+      padding: 0 14px;
+      font-size: 15px;
+      outline: none;
+      background: #fff;
+      color: #111;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--verde);
+      box-shadow: 0 0 0 3px rgba(31, 122, 99, .14);
+    }
+
+    .search-button {
+      width: 100%;
+      height: 48px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--verde);
+      color: #fff;
+      font-weight: bold;
+      font-size: 15px;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    .search-button:hover {
+      filter: brightness(.96);
+      transform: translateY(-1px);
+    }
+
+    /* ================= 6. CHAMADA ABAIXO DA BUSCA ================= */
     .intro-cta {
       background: var(--preto);
       text-align: center;
@@ -199,7 +295,7 @@
       line-height: 1.5;
     }
 
-    /* ================= 6. SEÇÕES ================= */
+    /* ================= 7. SEÇÕES ================= */
     .section {
       padding: 68px 24px;
       text-align: center;
@@ -242,7 +338,7 @@
       color: #e8e2cf;
     }
 
-    /* ================= 7. CARDS / ANÚNCIOS / EVENTOS ================= */
+    /* ================= 8. CARDS / ANÚNCIOS / EVENTOS ================= */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -296,13 +392,13 @@
       border-bottom: 1px solid #e6dcc3;
     }
 
-    .whatsapp-btn {
+    .details-btn {
       display: inline-flex;
       justify-content: center;
       align-items: center;
       margin-top: 12px;
       padding: 13px 16px;
-      background: #25D366;
+      background: var(--verde);
       color: white;
       border-radius: 10px;
       font-weight: bold;
@@ -310,7 +406,7 @@
       text-align: center;
     }
 
-    .whatsapp-btn:hover {
+    .details-btn:hover {
       filter: brightness(.95);
       transform: translateY(-1px);
     }
@@ -323,7 +419,7 @@
       text-align: center;
     }
 
-    /* ================= 8. GALERIA ================= */
+    /* ================= 9. GALERIA ================= */
     .gallery {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -342,51 +438,50 @@
       box-shadow: 0 10px 25px rgba(0, 0, 0, .14);
     }
 
-    /* ================= 9. REDES SOCIAIS ================= */
-    /* ================= REDES SOCIAIS ================= */
-.social-links {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 22px;
-  margin-top: 28px;
-}
+    /* ================= 10. REDES SOCIAIS ================= */
+    .social-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 22px;
+      margin-top: 28px;
+    }
 
-.social-links a {
-  width: 74px;
-  height: 74px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  box-shadow: 0 14px 28px rgba(0,0,0,.18);
-  transition: .2s ease;
-}
+    .social-links a {
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      box-shadow: 0 14px 28px rgba(0, 0, 0, .18);
+      transition: .2s ease;
+    }
 
-.social-links a:hover {
-  transform: translateY(-3px) scale(1.04);
-}
+    .social-links a:hover {
+      transform: translateY(-3px) scale(1.04);
+    }
 
-.social-links svg {
-  width: 34px;
-  height: 34px;
-  fill: white;
-}
+    .social-links svg {
+      width: 34px;
+      height: 34px;
+      fill: white;
+    }
 
-.instagram {
-  background: linear-gradient(135deg, #833AB4, #E1306C, #FCAF45);
-}
+    .instagram {
+      background: linear-gradient(135deg, #833AB4, #E1306C, #FCAF45);
+    }
 
-.facebook {
-  background: #1877F2;
-}
+    .facebook {
+      background: #1877F2;
+    }
 
-.whatsapp-social {
-  background: #25D366;
-}
+    .whatsapp-social {
+      background: #25D366;
+    }
 
-    /* ================= 10. BOTÃO FIXO WHATSAPP ================= */
+    /* ================= 11. BOTÃO FIXO WHATSAPP SUPORTE ================= */
     .whatsapp-fixo {
       position: fixed;
       right: 18px;
@@ -400,7 +495,6 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 30px;
       box-shadow: 0 10px 28px rgba(0, 0, 0, .35);
       transition: .2s ease;
     }
@@ -410,11 +504,13 @@
       filter: brightness(.95);
     }
 
-    .whatsapp-fixo::before {
-      content: "☎";
+    .whatsapp-fixo svg {
+      width: 32px;
+      height: 32px;
+      fill: #fff;
     }
 
-    /* ================= 11. RODAPÉ ================= */
+    /* ================= 12. RODAPÉ ================= */
     footer {
       background: #0b0f14;
       color: #ddd;
@@ -427,7 +523,13 @@
       color: #ffffff;
     }
 
-    /* ================= 12. MOBILE ================= */
+    /* ================= 13. MOBILE ================= */
+    @media (max-width: 900px) {
+      .search-fields {
+        grid-template-columns: repeat(2, minmax(160px, 1fr));
+      }
+    }
+
     @media (max-width: 760px) {
       .header {
         padding: 9px 14px;
@@ -448,9 +550,9 @@
       }
 
       .hero {
-        min-height: 420px;
+        min-height: 430px;
         margin-top: 64px;
-        padding: 54px 20px;
+        padding: 54px 20px 92px;
         background-position: center;
       }
 
@@ -466,6 +568,20 @@
       .button-outline {
         width: 100%;
         max-width: 280px;
+      }
+
+      .search-section {
+        padding: 24px 14px 34px;
+      }
+
+      .search-box {
+        margin-top: -74px;
+        padding: 18px;
+        border-radius: 18px;
+      }
+
+      .search-fields {
+        grid-template-columns: 1fr;
       }
 
       .intro-cta {
@@ -495,8 +611,13 @@
       }
 
       .social-links a {
-        width: 52px;
-        height: 52px;
+        width: 58px;
+        height: 58px;
+      }
+
+      .social-links svg {
+        width: 28px;
+        height: 28px;
       }
 
       .whatsapp-fixo {
@@ -504,7 +625,6 @@
         height: 56px;
         right: 14px;
         bottom: 14px;
-        font-size: 27px;
       }
     }
 
@@ -543,9 +663,9 @@
     <nav class="nav">
       <a href="#anuncios">Anúncios</a>
       <a href="#eventos">Eventos</a>
-      <a class="whatsapp-link" href="https://wa.me/5561991663179" target="_blank" aria-label="WhatsApp">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="#25D366">
-        <path d="M12 2a9.8 9.8 0 0 0-8.5 14.7L2 22l5.4-1.4A9.9 9.9 0 1 0 12 2zm0 17.8a7.8 7.8 0 0 1-4-1.1l-.3-.2-3.2.8.9-3.1-.2-.3A7.8 7.8 0 1 1 12 19.8zm4.3-5.8c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.4 6.4 0 0 1-3.2-2.8c-.2-.3 0-.4.1-.5l.4-.5c.1-.2.2-.3.3-.5a.5.5 0 0 0 0-.5c-.1-.1-.6-1.4-.8-1.9s-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 2.8 2.8 0 0 0-.9 2.1 4.9 4.9 0 0 0 1 2.6 11.2 11.2 0 0 0 4.3 3.8 14.8 14.8 0 0 0 1.5.5 3.5 3.5 0 0 0 1.6.1 2.6 2.6 0 0 0 1.7-1.2 2.1 2.1 0 0 0 .1-1.2c-.1-.1-.2-.2-.4-.3z"/>
+      <a class="whatsapp-link" href="https://wa.me/5561991663179?text=Olá! Tenho uma dúvida sobre o Clube da Caminhonete." target="_blank" aria-label="WhatsApp para dúvidas">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2a9.8 9.8 0 0 0-8.5 14.7L2 22l5.4-1.4A9.9 9.9 0 1 0 12 2zm0 17.8a7.8 7.8 0 0 1-4-1.1l-.3-.2-3.2.8.9-3.1-.2-.3A7.8 7.8 0 1 1 12 19.8zm4.3-5.8c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.4 6.4 0 0 1-3.2-2.8c-.2-.3 0-.4.1-.5l.4-.5c.1-.2.2-.3.3-.5a.5.5 0 0 0 0-.5c-.1-.1-.6-1.4-.8-1.9s-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 2.8 2.8 0 0 0-.9 2.1 4.9 4.9 0 0 0 1 2.6 11.2 11.2 0 0 0 4.3 3.8 14.8 14.8 0 0 0 1.5.5 3.5 3.5 0 0 0 1.6.1 2.6 2.6 0 0 0 1.7-1.2 2.1 2.1 0 0 0 .1-1.2c-.1-.1-.2-.2-.4-.3z" />
         </svg>
       </a>
     </nav>
@@ -562,18 +682,49 @@
         </p>
 
         <div class="hero-actions">
-          <a class="button" href="/publicar">
-              Anunciar veículo
-          </a>
-
-          <a class="button-outline" href="#anuncios">
-            Ver anúncios
-          </a>
+          <a class="button" href="/publicar">Anunciar veículo</a>
+          <a class="button-outline" href="#anuncios">Ver anúncios</a>
         </div>
       </div>
     </section>
 
-    <!-- ================= 5. BLOCO DE CONFIANÇA ================= -->
+    <!-- ================= 5. BUSCA POR MARCA / MODELO / ESTADO ================= -->
+    <section class="search-section" aria-label="Busca de veículos">
+      <div class="search-box">
+        <h2>Encontre seu clássico</h2>
+        <p>Busque anúncios por marca, modelo ou estado.</p>
+
+        <form class="search-fields" onsubmit="filtrarAnuncios(event)">
+          <div class="field">
+            <label for="busca-marca">Marca</label>
+            <input id="busca-marca" type="text" placeholder="Ex: Chevrolet, Ford" />
+          </div>
+
+          <div class="field">
+            <label for="busca-modelo">Modelo</label>
+            <input id="busca-modelo" type="text" placeholder="Ex: C10, F1000, D20" />
+          </div>
+
+          <div class="field">
+            <label for="busca-estado">Estado</label>
+            <select id="busca-estado">
+              <option value="">Todos os estados</option>
+              <option value="AC">AC</option><option value="AL">AL</option><option value="AP">AP</option><option value="AM">AM</option>
+              <option value="BA">BA</option><option value="CE">CE</option><option value="DF">DF</option><option value="ES">ES</option>
+              <option value="GO">GO</option><option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option>
+              <option value="MG">MG</option><option value="PA">PA</option><option value="PB">PB</option><option value="PR">PR</option>
+              <option value="PE">PE</option><option value="PI">PI</option><option value="RJ">RJ</option><option value="RN">RN</option>
+              <option value="RS">RS</option><option value="RO">RO</option><option value="RR">RR</option><option value="SC">SC</option>
+              <option value="SP">SP</option><option value="SE">SE</option><option value="TO">TO</option>
+            </select>
+          </div>
+
+          <button class="search-button" type="submit">Buscar anúncios</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ================= 6. BLOCO DE CONFIANÇA ================= -->
     <section class="intro-cta">
       <h1>Negocie veículos clássicos com segurança</h1>
 
@@ -583,21 +734,21 @@
       </p>
     </section>
 
-    <!-- ================= 6. CONTEÚDO DINÂMICO: ANÚNCIOS ================= -->
+    <!-- ================= 7. CONTEÚDO DINÂMICO: ANÚNCIOS ================= -->
     <section id="anuncios" class="section green">
       <h2>Anúncios disponíveis</h2>
       <p class="lead">Veículos clássicos aprovados pela plataforma.</p>
       <div id="lista-anuncios" class="grid"></div>
     </section>
 
-    <!-- ================= 7. CONTEÚDO DINÂMICO: EVENTOS ================= -->
+    <!-- ================= 8. CONTEÚDO DINÂMICO: EVENTOS ================= -->
     <section id="eventos" class="section cream">
       <h2>Eventos próximos</h2>
       <p class="lead">Encontros, exposições e eventos de veículos clássicos.</p>
       <div id="lista-eventos" class="grid"></div>
     </section>
 
-    <!-- ================= 8. CONTEÚDO FIXO: GALERIA ================= -->
+    <!-- ================= 9. CONTEÚDO FIXO: GALERIA ================= -->
     <section class="section white">
       <h2>Galeria de Clássicos</h2>
       <p class="lead">Veículos antigos, restaurações, encontros e histórias sobre rodas.</p>
@@ -612,7 +763,7 @@
       </div>
     </section>
 
-    <!-- ================= 9. CONTEÚDO FIXO: INSTITUCIONAL ================= -->
+    <!-- ================= 10. CONTEÚDO FIXO: INSTITUCIONAL ================= -->
     <section class="section cream">
       <h2>Uma empresa para quem vive a paixão por clássicos</h2>
       <p class="lead">
@@ -637,48 +788,53 @@
       </div>
     </section>
 
-    <!-- ================= 10. CONTEÚDO FIXO: MÍDIAS SOCIAIS ================= -->
-    <!-- ================= 10. CONTEÚDO FIXO: MÍDIAS SOCIAIS ================= -->
-<section class="section white">
-  <h2>Acompanhe nossas mídias</h2>
-  <p class="lead">Divulgamos anúncios, eventos e novidades nas redes sociais.</p>
+    <!-- ================= 11. CONTEÚDO FIXO: MÍDIAS SOCIAIS ================= -->
+    <section class="section white">
+      <h2>Acompanhe nossas mídias</h2>
+      <p class="lead">Divulgamos anúncios, eventos e novidades nas redes sociais.</p>
 
-  <div class="social-links">
-    <a class="instagram" href="https://www.instagram.com/clubedacaminhonete" target="_blank" aria-label="Instagram">
-      <svg viewBox="0 0 24 24">
-        <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5.5A4.5 4.5 0 1 0 12 16.5 4.5 4.5 0 0 0 12 7.5zm0 2A2.5 2.5 0 1 1 9.5 12 2.5 2.5 0 0 1 12 9.5zm5.2-2.8a1 1 0 1 0-1-1 1 1 0 0 0 1 1z"/>
-      </svg>
-    </a>
+      <div class="social-links">
+        <a class="instagram" href="https://www.instagram.com/clubedacaminhonete" target="_blank" aria-label="Instagram">
+          <svg viewBox="0 0 24 24">
+            <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5.5A4.5 4.5 0 1 0 12 16.5 4.5 4.5 0 0 0 12 7.5zm0 2A2.5 2.5 0 1 1 9.5 12 2.5 2.5 0 0 1 12 9.5zm5.2-2.8a1 1 0 1 0-1-1 1 1 0 0 0 1 1z" />
+          </svg>
+        </a>
 
-    <a class="facebook" href="https://www.facebook.com/clubedacaminhonete" target="_blank" aria-label="Facebook">
-      <svg viewBox="0 0 24 24">
-        <path d="M14 8h2V5h-2c-2.2 0-4 1.8-4 4v2H8v3h2v7h3v-7h2.3l.7-3h-3V9c0-.6.4-1 1-1z"/>
-      </svg>
-    </a>
+        <a class="facebook" href="https://www.facebook.com/clubedacaminhonete" target="_blank" aria-label="Facebook">
+          <svg viewBox="0 0 24 24">
+            <path d="M14 8h2V5h-2c-2.2 0-4 1.8-4 4v2H8v3h2v7h3v-7h2.3l.7-3h-3V9c0-.6.4-1 1-1z" />
+          </svg>
+        </a>
 
-    <a class="whatsapp-social" href="https://wa.me/5561991663179" target="_blank" aria-label="WhatsApp">
-      <svg viewBox="0 0 24 24">
-        <path d="M12 2a9.8 9.8 0 0 0-8.5 14.7L2 22l5.4-1.4A9.9 9.9 0 1 0 12 2zm0 17.8a7.8 7.8 0 0 1-4-1.1l-.3-.2-3.2.8.9-3.1-.2-.3A7.8 7.8 0 1 1 12 19.8zm4.3-5.8c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.4 6.4 0 0 1-3.2-2.8c-.2-.3 0-.4.1-.5l.4-.5c.1-.2.2-.3.3-.5a.5.5 0 0 0 0-.5c-.1-.1-.6-1.4-.8-1.9s-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 2.8 2.8 0 0 0-.9 2.1 4.9 4.9 0 0 0 1 2.6 11.2 11.2 0 0 0 4.3 3.8 14.8 14.8 0 0 0 1.5.5 3.5 3.5 0 0 0 1.6.1 2.6 2.6 0 0 0 1.7-1.2 2.1 2.1 0 0 0 .1-1.2c-.1-.1-.2-.2-.4-.3z"/>
-      </svg>
-    </a>
-  </div>
-</section>
-  <!-- ================= 11. RODAPÉ ================= -->
+        <a class="whatsapp-social" href="https://wa.me/5561991663179?text=Olá! Tenho uma dúvida sobre o Clube da Caminhonete." target="_blank" aria-label="WhatsApp">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2a9.8 9.8 0 0 0-8.5 14.7L2 22l5.4-1.4A9.9 9.9 0 1 0 12 2zm0 17.8a7.8 7.8 0 0 1-4-1.1l-.3-.2-3.2.8.9-3.1-.2-.3A7.8 7.8 0 1 1 12 19.8zm4.3-5.8c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.4 6.4 0 0 1-3.2-2.8c-.2-.3 0-.4.1-.5l.4-.5c.1-.2.2-.3.3-.5a.5.5 0 0 0 0-.5c-.1-.1-.6-1.4-.8-1.9s-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 2.8 2.8 0 0 0-.9 2.1 4.9 4.9 0 0 0 1 2.6 11.2 11.2 0 0 0 4.3 3.8 14.8 14.8 0 0 0 1.5.5 3.5 3.5 0 0 0 1.6.1 2.6 2.6 0 0 0 1.7-1.2 2.1 2.1 0 0 0 .1-1.2c-.1-.1-.2-.2-.4-.3z" />
+          </svg>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= 12. RODAPÉ ================= -->
   <footer>
     <strong>Clube da Caminhonete</strong><br />
-    O Melhor Site de Carros Antigos do Brasil<br />
-    Marketplace de veículos clássicos
+    O melhor site de carros antigos do Brasil<br />
+    Plataforma de veículos clássicos
   </footer>
 
-  <!-- ================= BOTÃO FIXO WHATSAPP ================= -->
+  <!-- ================= BOTÃO FIXO WHATSAPP SUPORTE ================= -->
   <a
     class="whatsapp-fixo"
-    href="https://wa.me/5561991663179?text=Olá! Vim pelo site Clube da Caminhonete."
+    href="https://wa.me/5561991663179?text=Olá! Tenho uma dúvida sobre o Clube da Caminhonete."
     target="_blank"
     aria-label="Falar no WhatsApp"
-  ></a>
+  >
+    <svg viewBox="0 0 24 24">
+      <path d="M12 2a9.8 9.8 0 0 0-8.5 14.7L2 22l5.4-1.4A9.9 9.9 0 1 0 12 2zm0 17.8a7.8 7.8 0 0 1-4-1.1l-.3-.2-3.2.8.9-3.1-.2-.3A7.8 7.8 0 1 1 12 19.8zm4.3-5.8c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.4 6.4 0 0 1-3.2-2.8c-.2-.3 0-.4.1-.5l.4-.5c.1-.2.2-.3.3-.5a.5.5 0 0 0 0-.5c-.1-.1-.6-1.4-.8-1.9s-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 2.8 2.8 0 0 0-.9 2.1 4.9 4.9 0 0 0 1 2.6 11.2 11.2 0 0 0 4.3 3.8 14.8 14.8 0 0 0 1.5.5 3.5 3.5 0 0 0 1.6.1 2.6 2.6 0 0 0 1.7-1.2 2.1 2.1 0 0 0 .1-1.2c-.1-.1-.2-.2-.4-.3z" />
+    </svg>
+  </a>
 
-  <!-- ================= 12. FIREBASE / BANCO DE DADOS ================= -->
+  <!-- ================= 13. FIREBASE / BANCO DE DADOS ================= -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
@@ -694,6 +850,7 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    let anunciosCarregados = [];
 
     function limparTexto(valor) {
       if (valor === undefined || valor === null) return "";
@@ -704,6 +861,14 @@
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
+    }
+
+    function normalizar(valor) {
+      return String(valor || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim();
     }
 
     function formatarPreco(valor) {
@@ -728,6 +893,7 @@
       const estado = limparTexto(anuncio.estado);
       const descricao = limparTexto(anuncio.descricao);
       const imagem = limparTexto(anuncio.imagem || anuncio.foto || anuncio.imageUrl || "");
+      const id = limparTexto(anuncio.id || "");
 
       const card = document.createElement("article");
       card.className = "card";
@@ -739,13 +905,51 @@
         <p class="price">${formatarPreco(anuncio.preco)}</p>
         <p>${cidade}${cidade && estado ? " - " : ""}${estado}</p>
         <p>${descricao}</p>
-        <a class="whatsapp-btn" href="https://wa.me/5561991663179?text=Olá! Tenho interesse no anúncio ${encodeURIComponent(titulo)}" target="_blank">
-          Tenho interesse pelo WhatsApp
+        <a class="details-btn" href="/detalhes?id=${encodeURIComponent(id)}">
+          Ver detalhes
         </a>
       `;
 
       return card;
     }
+
+    function renderizarAnuncios(lista) {
+      const container = document.getElementById("lista-anuncios");
+      container.innerHTML = "";
+
+      if (!lista.length) {
+        container.innerHTML = `<p class="empty-message">Nenhum anúncio encontrado com esses filtros.</p>`;
+        return;
+      }
+
+      lista.forEach(anuncio => {
+        container.appendChild(criarCardAnuncio(anuncio));
+      });
+    }
+
+    window.filtrarAnuncios = function(event) {
+      event.preventDefault();
+
+      const marca = normalizar(document.getElementById("busca-marca").value);
+      const modelo = normalizar(document.getElementById("busca-modelo").value);
+      const estado = normalizar(document.getElementById("busca-estado").value);
+
+      const filtrados = anunciosCarregados.filter(anuncio => {
+        const marcaAnuncio = normalizar(anuncio.marca);
+        const modeloAnuncio = normalizar(anuncio.modelo);
+        const tituloAnuncio = normalizar(anuncio.titulo);
+        const estadoAnuncio = normalizar(anuncio.estado);
+
+        const bateMarca = !marca || marcaAnuncio.includes(marca) || tituloAnuncio.includes(marca);
+        const bateModelo = !modelo || modeloAnuncio.includes(modelo) || tituloAnuncio.includes(modelo);
+        const bateEstado = !estado || estadoAnuncio === estado;
+
+        return bateMarca && bateModelo && bateEstado;
+      });
+
+      renderizarAnuncios(filtrados);
+      document.getElementById("anuncios").scrollIntoView({ behavior: "smooth" });
+    };
 
     function criarCardEvento(evento) {
       const titulo = limparTexto(evento.titulo || "Evento de veículos clássicos");
@@ -767,8 +971,8 @@
         <p>📅 ${data}${hora ? " às " + hora : ""}</p>
         <p>📍 ${local}${local && cidade ? " — " : ""}${cidade}${cidade && estado ? " - " : ""}${estado}</p>
         <p>${descricao}</p>
-        <a class="whatsapp-btn" href="https://wa.me/${telefone}" target="_blank">
-          Falar sobre o evento
+        <a class="details-btn" href="https://wa.me/${telefone}?text=Olá! Tenho uma dúvida sobre o evento ${encodeURIComponent(titulo)}" target="_blank">
+          Saber mais
         </a>
       `;
 
@@ -781,22 +985,22 @@
 
       try {
         const snapshot = await getDocs(collection(db, "anuncios"));
-        container.innerHTML = "";
-
-        let total = 0;
+        anunciosCarregados = [];
 
         snapshot.forEach(doc => {
           const anuncio = doc.data();
 
           if (anuncio.status === "aprovado") {
-            container.appendChild(criarCardAnuncio(anuncio));
-            total++;
+            anunciosCarregados.push({ id: doc.id, ...anuncio });
           }
         });
 
-        if (total === 0) {
+        if (anunciosCarregados.length === 0) {
           container.innerHTML = `<p class="empty-message">Nenhum anúncio aprovado no momento.</p>`;
+          return;
         }
+
+        renderizarAnuncios(anunciosCarregados);
       } catch (error) {
         console.error("Erro ao carregar anúncios:", error);
         container.innerHTML = `<p class="empty-message">Não foi possível carregar os anúncios agora.</p>`;
