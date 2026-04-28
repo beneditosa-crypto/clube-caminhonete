@@ -18,10 +18,19 @@
       scroll-behavior: smooth;
     }
 
+    :root {
+      --preto: #0B0F0D;
+      --verde: #1F7A63;
+      --verde-neon: #3FE0A1;
+      --bege: #EDE6D6;
+      --dourado: #d9c48f;
+      --branco: #ffffff;
+    }
+
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
-      background: #ffffff;
+      background: var(--preto);
       color: #1b1b1b;
     }
 
@@ -40,13 +49,13 @@
       top: 0;
       width: 100%;
       z-index: 20;
-      background: rgba(255,255,255,.96);
-      border-bottom: 1px solid #ddd;
+      background: rgba(11,15,13,.96);
+      border-bottom: 1px solid rgba(237,230,214,.15);
       padding: 10px 22px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 6px 20px rgba(0,0,0,.08);
+      box-shadow: 0 6px 20px rgba(0,0,0,.35);
     }
 
     .brand {
@@ -54,15 +63,15 @@
       align-items: center;
       gap: 10px;
       font-weight: bold;
-      color: #17351f;
+      color: var(--bege);
       white-space: nowrap;
     }
 
     .brand img {
-      width: 48px;
-      height: 48px;
+      width: 54px;
+      height: 54px;
       border-radius: 50%;
-      object-fit: cover;
+      object-fit: contain;
     }
 
     .nav {
@@ -74,7 +83,11 @@
     }
 
     .nav a {
-      color: #17351f;
+      color: var(--bege);
+    }
+
+    .nav a:hover {
+      color: var(--verde-neon);
     }
 
     .whatsapp-link {
@@ -83,24 +96,26 @@
 
     /* ================= BANNER LIMPO ================= */
     .hero {
-      height: 58vh;
-      min-height: 360px;
+      height: 62vh;
+      min-height: 390px;
+      margin-top: 74px;
       background:
-        linear-gradient(rgba(0,0,0,.18), rgba(0,0,0,.28)),
-        url("assets/images/banner.png");
+        linear-gradient(90deg, rgba(11,15,13,.42), rgba(11,15,13,.15)),
+        url("asset/imagens/banner-principal.png");
       background-size: cover;
       background-position: center;
     }
 
     /* ================= CHAMADA ABAIXO DO BANNER ================= */
     .intro-cta {
-      background: #ffffff;
+      background: var(--preto);
       text-align: center;
-      padding: 46px 22px 58px;
+      padding: 50px 22px 62px;
+      color: var(--bege);
     }
 
     .intro-cta h1 {
-      color: #17351f;
+      color: var(--bege);
       font-size: clamp(32px, 5vw, 56px);
       margin: 0 0 16px;
       line-height: 1.08;
@@ -109,7 +124,7 @@
     .intro-cta p {
       max-width: 760px;
       margin: 0 auto 26px;
-      color: #444;
+      color: #d8d1bf;
       font-size: 20px;
       line-height: 1.5;
     }
@@ -118,10 +133,10 @@
       display: inline-block;
       padding: 15px 26px;
       border-radius: 12px;
-      background: #d9c48f;
-      color: #111;
+      background: var(--verde-neon);
+      color: #06100d;
       font-weight: bold;
-      box-shadow: 0 10px 24px rgba(0,0,0,.18);
+      box-shadow: 0 10px 24px rgba(63,224,161,.22);
       transition: .2s ease;
     }
 
@@ -150,7 +165,7 @@
     }
 
     .green h2 {
-      color: #d9c48f;
+      color: var(--dourado);
     }
 
     h2 {
@@ -330,8 +345,8 @@
       }
 
       .brand img {
-        width: 42px;
-        height: 42px;
+        width: 46px;
+        height: 46px;
       }
 
       .nav {
@@ -341,7 +356,9 @@
 
       .hero {
         height: 45vh;
-        min-height: 280px;
+        min-height: 300px;
+        margin-top: 64px;
+        background-position: center;
       }
 
       .intro-cta {
@@ -400,7 +417,7 @@
 <!-- ================= 3. TOPO / MENU ================= -->
 <header class="header">
   <div class="brand">
-    <img src="assets/images/icon.png" alt="Logo Clube da Caminhonete" />
+    <img src="asset/imagens/logo-principal.png" alt="Logo Clube da Caminhonete" />
     <span>Clube da Caminhonete</span>
   </div>
 
