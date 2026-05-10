@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
+
 import { router } from "expo-router";
+
 import {
   ActivityIndicator,
   Image,
@@ -9,10 +11,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { collection, onSnapshot } from "firebase/firestore";
+
+import {
+  collection,
+  onSnapshot,
+} from "firebase/firestore";
 
 import { db } from "../../services/firebase";
-import { colors } from "../../utils/theme";
 
 type Evento = {
   id: string;
@@ -26,91 +31,164 @@ type Evento = {
 };
 
 export default function HomeEventos() {
-  const [eventos, setEventos] = useState<Evento[]>([]);
-  const [carregando, setCarregando] = useState(true);
+  const [eventos, setEventos] = useState<
+    Evento[]
+  >([]);
+
+  const [carregando, setCarregando] =
+    useState(true);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "eventos"), (snapshot) => {
-      const lista = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Evento[];
+    const unsubscribe = onSnapshot(
+      collection(db, "eventos"),
+      (snapshot) => {
+        const lista = snapshot.docs.map(
+          (doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          })
+        ) as Evento[];
 
-      const ativos = lista.filter((item) => item.status === "ATIVO");
+        const ativos = lista.filter(
+          (item) =>
+            item.status === "ATIVO"
+        );
 
-      setEventos(ativos);
-      setCarregando(false);
-    });
+        setEventos(ativos);
+
+        setCarregando(false);
+      }
+    );
 
     return () => unsubscribe();
   }, []);
 
-  const eventosOrdenados = useMemo(() => {
-    return [...eventos].reverse().slice(0, 6);
-  }, [eventos]);
+  const eventosOrdenados =
+    useMemo(() => {
+      return [...eventos]
+        .reverse()
+        .slice(0, 8);
+    }, [eventos]);
 
   if (carregando) {
     return (
-      <View style={styles.secao}>
-        <ActivityIndicator size="large" color={colors.primary} />
+      <View style={styles.loading}>
+        <ActivityIndicator
+          size="large"
+          color="#1E3A8A"
+        />
       </View>
     );
   }
 
   return (
-    <View style={styles.secao}>
-      {eventosOrdenados.length === 0 ? (
+    <View style={styles.container}>
+      {eventosOrdenados.length ===
+      0 ? (
         <View style={styles.vazio}>
-          <Text style={styles.vazioTitulo}>Nenhum evento aprovado ainda</Text>
-          <Text style={styles.vazioTexto}>
-            Em breve os encontros aparecerão por aqui.
+          <Text
+            style={styles.vazioTitulo}
+          >
+            Nenhum evento aprovado
+            ainda
+          </Text>
+
+          <Text
+            style={styles.vazioTexto}
+          >
+            Em breve os encontros
+            aparecerão por aqui.
           </Text>
         </View>
       ) : (
         <ScrollView
           horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.lista}
+          showsHorizontalScrollIndicator={
+            false
+          }
+          contentContainerStyle={
+            styles.lista
+          }
         >
-          {eventosOrdenados.map((evento) => (
-            <TouchableOpacity
-              key={evento.id}
-              style={styles.card}
-              activeOpacity={0.9}
-              onPress={() => router.push(`/detalhe-evento/${evento.id}`)}
-            >
-              {evento.fotos?.[0] ? (
-                <Image source={{ uri: evento.fotos[0] }} style={styles.foto} />
-              ) : (
-                <View style={styles.semFoto}>
-                  <Text style={styles.semFotoTexto}>Evento</Text>
+          {eventosOrdenados.map(
+            (evento) => (
+              <TouchableOpacity
+                key={evento.id}
+                style={styles.card}
+                activeOpacity={0.92}
+                onPress={() =>
+                  router.push(
+                    `/detalhe-evento/${evento.id}`
+                  )
+                }
+              >
+                {evento.fotos?.[0] ? (
+                  <Image
+                    source={{
+                      uri: evento
+                        .fotos[0],
+                    }}
+                    style={
+                      styles.foto
+                    }
+                  />
+                ) : (
+                  <View
+                    style={
+                      styles.semFoto
+                    }
+                  >
+                    <Text
+                      style={
+                        styles.semFotoTexto
+                      }
+                    >
+                      Evento
+                    </Text>
+                  </View>
+                )}
+
+                <View
+                  style={
+                    styles.overlay
+                  }
+                >
+                  <Text
+                    style={
+                      styles.data
+                    }
+                    numberOfLines={1}
+                  >
+                    {evento.data ||
+                      "Data em breve"}
+                  </Text>
+
+                  <Text
+                    style={
+                      styles.titulo
+                    }
+                    numberOfLines={2}
+                  >
+                    {evento.titulo ||
+                      "Evento"}
+                  </Text>
+
+                  <Text
+                    style={
+                      styles.local
+                    }
+                    numberOfLines={1}
+                  >
+                    {evento.cidade ||
+                      "Cidade"}{" "}
+                    -{" "}
+                    {evento.estado ||
+                      "UF"}
+                  </Text>
                 </View>
-              )}
-
-              <View style={styles.info}>
-                <Text style={styles.data}>
-                  {evento.data || "Data em breve"}
-                </Text>
-
-                <Text style={styles.tituloEvento} numberOfLines={2}>
-                  {evento.titulo || "Evento de antigomobilismo"}
-                </Text>
-
-                <Text style={styles.local} numberOfLines={1}>
-                  {evento.cidade || "Cidade"} - {evento.estado || "UF"}
-                </Text>
-
-                <Text style={styles.texto} numberOfLines={3}>
-                  {evento.descricao ||
-                    "Encontro para veículos antigos e apaixonados por clássicos."}
-                </Text>
-
-                <View style={styles.botao}>
-                  <Text style={styles.botaoTexto}>Ver detalhes</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
+              </TouchableOpacity>
+            )
+          )}
         </ScrollView>
       )}
     </View>
@@ -118,109 +196,130 @@ export default function HomeEventos() {
 }
 
 const styles = StyleSheet.create({
-  secao: {
-    marginTop: 6,
-    paddingBottom: 20,
-    backgroundColor: colors.background,
+  container: {
+    marginTop: 4,
+    paddingBottom: 12,
+  },
+
+  loading: {
+    paddingVertical: 40,
   },
 
   lista: {
     paddingLeft: 20,
     paddingRight: 10,
-    gap: 14,
+    gap: 12,
   },
 
   vazio: {
     marginHorizontal: 20,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 18,
+
     padding: 18,
+
+    borderRadius: 18,
+
+    backgroundColor: "#F9FAFB",
+
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: "#E5E7EB",
   },
 
   vazioTitulo: {
-    color: colors.text,
-    fontWeight: "900",
     fontSize: 16,
+    fontWeight: "900",
+    color: "#111111",
+    textAlign: "center",
   },
 
   vazioTexto: {
-    color: colors.textMuted,
     marginTop: 6,
+
+    fontSize: 14,
+
+    color: "#6B7280",
+
+    textAlign: "center",
+
     lineHeight: 20,
-    fontWeight: "600",
   },
 
   card: {
-    width: 250,
-    backgroundColor: "#111827",
-    borderRadius: 20,
+    width: 170,
+    height: 230,
+
+    borderRadius: 24,
+
     overflow: "hidden",
+
+    backgroundColor: "#E5E7EB",
+
+    position: "relative",
   },
 
   foto: {
     width: "100%",
-    height: 130,
-    backgroundColor: "#F3F4F6",
+    height: "100%",
+    position: "absolute",
   },
 
   semFoto: {
-    width: "100%",
-    height: 130,
-    backgroundColor: "#111827",
+    flex: 1,
+
     alignItems: "center",
     justifyContent: "center",
+
+    backgroundColor: "#E5E7EB",
   },
 
   semFotoTexto: {
-    color: colors.primary,
-    fontWeight: "900",
-    fontSize: 14,
+    color: "#6B7280",
+    fontWeight: "700",
   },
 
-  info: {
-    padding: 16,
+  overlay: {
+    position: "absolute",
+
+    left: 0,
+    right: 0,
+    bottom: 0,
+
+    paddingHorizontal: 14,
+    paddingTop: 28,
+    paddingBottom: 14,
+
+    backgroundColor:
+      "rgba(15,23,42,0.60)",
   },
 
   data: {
-    color: colors.primary,
-    fontSize: 13,
+    color: "rgba(255,255,255,0.80)",
+
+    fontSize: 10,
+
     fontWeight: "900",
-    marginBottom: 8,
+
+    marginBottom: 5,
+
+    textTransform: "uppercase",
   },
 
-  tituloEvento: {
+  titulo: {
     color: "#FFFFFF",
-    fontSize: 17,
+
+    fontSize: 14,
+
     fontWeight: "900",
-    marginBottom: 6,
+
+    lineHeight: 18,
   },
 
   local: {
-    color: colors.primary,
-    fontSize: 13,
-    fontWeight: "900",
-    marginBottom: 8,
-  },
+    marginTop: 5,
 
-  texto: {
-    color: "#E5E7EB",
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: "600",
-  },
+    color: "rgba(255,255,255,0.82)",
 
-  botao: {
-    marginTop: 16,
-    backgroundColor: colors.primary,
-    borderRadius: 14,
-    paddingVertical: 11,
-    alignItems: "center",
-  },
+    fontSize: 11,
 
-  botaoTexto: {
-    color: "#FFFFFF",
-    fontWeight: "900",
+    fontWeight: "700",
   },
 });

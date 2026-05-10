@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  Dimensions,
   Image,
   ScrollView,
   StyleSheet,
@@ -9,12 +10,18 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { collection, limit, onSnapshot, query, where } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 
-import { db } from "../services/firebase";
 import AppHeader from "../components/layout/AppHeader";
+import { db } from "../services/firebase";
+
+const { width } = Dimensions.get("window");
+
+const CARD_WIDTH = Math.round(width / 2.55);
+const CARD_EVENTO_WIDTH = Math.round(width / 2.35);
 
 type Anuncio = {
   id: string;
@@ -27,6 +34,7 @@ type Anuncio = {
   cidade?: string;
   fotos?: string[];
   status?: string;
+  destaque?: boolean;
   criadoEm?: any;
 };
 
@@ -42,13 +50,26 @@ type Evento = {
   criadoEm?: any;
 };
 
-function formatarPreco(valor?: string | number) {
-  if (!valor) return "Preço sob consulta";
+const REGIOES: Record<string, string[]> = {
+  "Centro-Oeste": ["DF", "GO", "MT", "MS"],
+  Sudeste: ["SP", "RJ", "MG", "ES"],
+  Sul: ["PR", "SC", "RS"],
+  Nordeste: ["BA", "SE", "AL", "PE", "PB", "RN", "CE", "PI", "MA"],
+  Norte: ["AM", "PA", "AC", "RO", "RR", "AP", "TO"],
+};
 
-  if (typeof valor === "string" && valor.includes("R$")) return valor;
+function formatarPreco(valor?: string | number) {
+  if (!valor) return "Consultar";
+
+  if (typeof valor === "string" && valor.includes("R$")) {
+    return valor;
+  }
 
   const numero = Number(valor);
-  if (Number.isNaN(numero)) return String(valor);
+
+  if (Number.isNaN(numero)) {
+    return String(valor);
+  }
 
   return numero.toLocaleString("pt-BR", {
     style: "currency",
@@ -56,12 +77,45 @@ function formatarPreco(valor?: string | number) {
   });
 }
 
-function ordenarPorData(lista: any[]) {
+function ordenarPorData<T extends { criadoEm?: any }>(lista: T[]) {
   return [...lista].sort((a, b) => {
     const dataA = a?.criadoEm?.seconds || 0;
     const dataB = b?.criadoEm?.seconds || 0;
+
     return dataB - dataA;
   });
+}
+
+function obterRegiao(estado?: string) {
+  if (!estado) return "";
+
+  const uf = estado.trim().toUpperCase();
+
+  return (
+    Object.entries(REGIOES).find(([, estados]) =>
+      estados.includes(uf)
+    )?.[0] || ""
+  );
+}
+
+function agruparPorRegiao<T extends { estado?: string }>(lista: T[]) {
+  const grupos: Record<string, T[]> = {};
+
+  Object.keys(REGIOES).forEach((regiao) => {
+    grupos[regiao] = [];
+  });
+
+  lista.forEach((item) => {
+    const regiao = obterRegiao(item.estado);
+
+    if (regiao) {
+      grupos[regiao].push(item);
+    }
+  });
+
+  return Object.entries(grupos).filter(
+    ([, itens]) => itens.length > 0
+  );
 }
 
 export default function Home() {
@@ -74,16 +128,15 @@ export default function Home() {
   useEffect(() => {
     const q = query(
       collection(db, "anuncios"),
-      where("status", "==", "ATIVO"),
-      limit(12)
+      where("status", "==", "ATIVO")
     );
 
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        const lista = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
+        const lista = snapshot.docs.map((documento) => ({
+          id: documento.id,
+          ...documento.data(),
         })) as Anuncio[];
 
         setAnuncios(ordenarPorData(lista));
@@ -98,16 +151,15 @@ export default function Home() {
   useEffect(() => {
     const q = query(
       collection(db, "eventos"),
-      where("status", "==", "ATIVO"),
-      limit(8)
+      where("status", "==", "ATIVO")
     );
 
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        const lista = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
+        const lista = snapshot.docs.map((documento) => ({
+          id: documento.id,
+          ...documento.data(),
         })) as Evento[];
 
         setEventos(ordenarPorData(lista));
@@ -140,8 +192,212 @@ export default function Home() {
     });
   }, [busca, anuncios]);
 
-  const destaques = anunciosFiltrados.slice(0, 4);
-  const recentes = anunciosFiltrados.slice(4, 12);
+  const recentes = anunciosFiltrados.slice(0, 12);
+
+  const anunciosPorRegiao =
+    agruparPorRegiao(anunciosFiltrados);
+
+  const eventosPorRegiao =
+    agruparPorRegiao(eventos);
+
+  function renderCardAnuncio(item: Anuncio) {
+    const destacado = item.destaque === true;
+
+    return (
+      <TouchableOpacity
+        key={item.id}
+        style={[
+          styles.cardAnuncio,
+          destacado && styles.cardAnuncioDestaque,
+        ]}
+        activeOpacity={0.9}
+        onPress={() =>
+          router.push(`/detalhe/${item.id}` as any)
+        }
+      >
+        <View style={styles.imagemBox}>
+          <Image
+            source={
+              item.fotos?.[0]
+                ? { uri: item.fotos[0] }
+                : require("../assets/images/logo.png")
+            }
+            style={[
+              styles.cardImagem,
+              destacado && styles.cardImagemDestaque,
+            ]}
+            resizeMode="cover"
+          />
+
+          {destacado && (
+            <>
+              <View style={styles.overlayDestaque} />
+
+              <View style={styles.estrelaBox}>
+                <Ionicons
+                  name="star"
+                  size={11}
+                  color="#E5E7EB"
+                />
+              </View>
+            </>
+          )}
+        </View>
+
+        <View style={styles.cardInfo}>
+          <Text
+            style={styles.cardTitulo}
+            numberOfLines={1}
+          >
+            {item.titulo || "Veículo clássico"}
+          </Text>
+
+          <Text
+            style={styles.cardPreco}
+            numberOfLines={1}
+          >
+            {formatarPreco(item.preco)}
+          </Text>
+
+          <Text
+            style={styles.cardLocal}
+            numberOfLines={1}
+          >
+            {[item.cidade, item.estado]
+              .filter(Boolean)
+              .join(" - ")}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    );
+  }
+
+  function renderCardEvento(item: Evento) {
+    const imagem = item.imagem || item.fotos?.[0];
+
+    return (
+      <TouchableOpacity
+        key={item.id}
+        style={styles.cardEvento}
+        activeOpacity={0.9}
+        onPress={() =>
+          router.push(
+            `/detalhe-evento/${item.id}` as any
+          )
+        }
+      >
+        <Image
+          source={
+            imagem
+              ? { uri: imagem }
+              : require("../assets/images/logo.png")
+          }
+          style={styles.eventoImagem}
+          resizeMode="cover"
+        />
+
+        <View style={styles.cardInfo}>
+          <Text
+            style={styles.cardTitulo}
+            numberOfLines={1}
+          >
+            {item.titulo || "Evento"}
+          </Text>
+
+          <Text
+            style={styles.cardLocal}
+            numberOfLines={1}
+          >
+            {[item.cidade, item.estado]
+              .filter(Boolean)
+              .join(" - ")}
+          </Text>
+
+          {!!item.data && (
+            <Text
+              style={styles.eventoData}
+              numberOfLines={1}
+            >
+              {item.data}
+            </Text>
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  }
+
+  function renderSecaoAnuncios(
+    titulo: string,
+    lista: Anuncio[],
+    verTodos = false
+  ) {
+    if (lista.length === 0) return null;
+
+    return (
+      <>
+        <View style={styles.secaoCabecalho}>
+          <Text style={styles.secaoTitulo}>
+            {titulo}
+          </Text>
+
+          {verTodos && (
+            <TouchableOpacity
+              onPress={() =>
+                router.push("/anuncios" as any)
+              }
+            >
+              <Text style={styles.verTudo}>
+                Ver todos
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.listaHorizontal}
+        >
+          {lista.map(renderCardAnuncio)}
+        </ScrollView>
+      </>
+    );
+  }
+
+  function renderSecaoEventos(
+    titulo: string,
+    lista: Evento[]
+  ) {
+    if (lista.length === 0) return null;
+
+    return (
+      <>
+        <View style={styles.secaoCabecalho}>
+          <Text style={styles.secaoTitulo}>
+            {titulo}
+          </Text>
+
+          <TouchableOpacity
+            onPress={() =>
+              router.push("/eventos" as any)
+            }
+          >
+            <Text style={styles.verTudo}>
+              Ver eventos
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.listaHorizontal}
+        >
+          {lista.map(renderCardEvento)}
+        </ScrollView>
+      </>
+    );
+  }
 
   return (
     <ScrollView
@@ -149,10 +405,18 @@ export default function Home() {
       contentContainerStyle={styles.conteudo}
       showsVerticalScrollIndicator={false}
     >
-      <AppHeader slogan="Mais que carros, uma paixão" mostrarNotificacao />
+      <AppHeader
+        slogan="Mais que carros, uma paixão"
+        mostrarNotificacao
+      />
 
       <View style={styles.buscaBox}>
-        <Ionicons name="search-outline" size={20} color="#6B7280" />
+        <Ionicons
+          name="search-outline"
+          size={18}
+          color="#6B7280"
+        />
+
         <TextInput
           style={styles.buscaInput}
           placeholder="Buscar por modelo, cidade, marca..."
@@ -162,169 +426,75 @@ export default function Home() {
         />
       </View>
 
-      <View style={styles.secaoCabecalho}>
-        <Text style={styles.secaoTitulo}>Destaques</Text>
-
-        <TouchableOpacity onPress={() => router.push("/anuncios" as any)}>
-          <Text style={styles.verTudo}>Ver todos</Text>
-        </TouchableOpacity>
-      </View>
-
       {carregandoAnuncios ? (
         <View style={styles.carregandoBox}>
-          <ActivityIndicator size="small" color="#111111" />
-          <Text style={styles.carregandoTexto}>Carregando anúncios...</Text>
+          <ActivityIndicator
+            size="small"
+            color="#111111"
+          />
+
+          <Text style={styles.carregandoTexto}>
+            Carregando anúncios...
+          </Text>
         </View>
-      ) : destaques.length === 0 ? (
+      ) : anunciosFiltrados.length === 0 ? (
         <View style={styles.vazioBox}>
-          <Text style={styles.vazioTitulo}>Nenhum anúncio encontrado</Text>
+          <Text style={styles.vazioTitulo}>
+            Nenhum anúncio encontrado
+          </Text>
+
           <Text style={styles.vazioTexto}>
-            Assim que novos veículos forem aprovados, eles aparecerão aqui.
+            Assim que novos veículos forem aprovados,
+            eles aparecerão aqui.
           </Text>
         </View>
       ) : (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.listaHorizontal}
-        >
-          {destaques.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={styles.cardDestaqueHorizontal}
-              activeOpacity={0.9}
-              onPress={() => router.push(`/detalhe/${item.id}` as any)}
-            >
-              <Image
-                source={
-                  item.fotos?.[0]
-                    ? { uri: item.fotos[0] }
-                    : require("../assets/images/logo.png")
-                }
-                style={styles.cardImagemGrande}
-                resizeMode="cover"
-              />
-
-              <View style={styles.overlayGradiente} />
-
-              <View style={styles.cardOverlay}>
-                <Text style={styles.cardTituloOverlay} numberOfLines={1}>
-                  {item.titulo || "Veículo clássico"}
-                </Text>
-
-                <Text style={styles.cardSubOverlay} numberOfLines={1}>
-                  {[item.marca, item.modelo, item.ano]
-                    .filter(Boolean)
-                    .join(" • ")}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      )}
-
-      {recentes.length > 0 && (
         <>
-          <View style={styles.secaoCabecalho}>
-            <Text style={styles.secaoTitulo}>Recentes</Text>
-          </View>
+          {renderSecaoAnuncios(
+            "Recentes",
+            recentes
+          )}
 
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.listaHorizontal}
-          >
-            {recentes.map((item) => (
-              <TouchableOpacity
-                key={item.id}
-                style={styles.cardHorizontal}
-                activeOpacity={0.9}
-                onPress={() => router.push(`/detalhe/${item.id}` as any)}
+          {anunciosPorRegiao.map(
+            ([regiao, lista]) => (
+              <View
+                key={`regiao-${regiao}`}
               >
-                <Image
-                  source={
-                    item.fotos?.[0]
-                      ? { uri: item.fotos[0] }
-                      : require("../assets/images/logo.png")
-                  }
-                  style={styles.cardHorizontalImagem}
-                  resizeMode="cover"
-                />
-
-                <Text style={styles.cardHorizontalTitulo} numberOfLines={1}>
-                  {item.titulo || "Veículo clássico"}
-                </Text>
-
-                <Text style={styles.cardHorizontalPreco}>
-                  {formatarPreco(item.preco)}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+                {renderSecaoAnuncios(
+                  regiao,
+                  lista.slice(0, 10)
+                )}
+              </View>
+            )
+          )}
         </>
       )}
 
-      <View style={styles.secaoCabecalho}>
-        <Text style={styles.secaoTitulo}>Eventos</Text>
+      {!carregandoEventos &&
+        eventosPorRegiao.map(
+          ([regiao, lista]) => (
+            <View
+              key={`eventos-${regiao}`}
+            >
+              {renderSecaoEventos(
+                `Eventos no ${regiao}`,
+                lista.slice(0, 10)
+              )}
+            </View>
+          )
+        )}
 
-        <TouchableOpacity onPress={() => router.push("/eventos" as any)}>
-          <Text style={styles.verTudo}>Ver eventos</Text>
-        </TouchableOpacity>
-      </View>
-
-      {carregandoEventos ? (
+      {carregandoEventos && (
         <View style={styles.carregandoBox}>
-          <ActivityIndicator size="small" color="#111111" />
-          <Text style={styles.carregandoTexto}>Carregando eventos...</Text>
-        </View>
-      ) : eventos.length === 0 ? (
-        <View style={styles.vazioBox}>
-          <Text style={styles.vazioTitulo}>Nenhum evento aprovado</Text>
-          <Text style={styles.vazioTexto}>
-            Os próximos encontros aparecerão aqui.
+          <ActivityIndicator
+            size="small"
+            color="#111111"
+          />
+
+          <Text style={styles.carregandoTexto}>
+            Carregando eventos...
           </Text>
         </View>
-      ) : (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.listaHorizontal}
-        >
-          {eventos.map((item) => {
-            const imagem = item.imagem || item.fotos?.[0];
-
-            return (
-              <TouchableOpacity
-                key={item.id}
-                style={styles.cardEvento}
-                activeOpacity={0.9}
-                onPress={() =>
-                  router.push(`/detalhe-evento/${item.id}` as any)
-                }
-              >
-                <Image
-                  source={
-                    imagem
-                      ? { uri: imagem }
-                      : require("../assets/images/logo.png")
-                  }
-                  style={styles.eventoImagem}
-                  resizeMode="cover"
-                />
-
-                <View style={styles.eventoConteudo}>
-                  <Text style={styles.eventoTitulo} numberOfLines={1}>
-                    {item.titulo || "Evento de antigomobilismo"}
-                  </Text>
-
-                  <Text style={styles.eventoLocal} numberOfLines={1}>
-                    {[item.cidade, item.estado].filter(Boolean).join(" / ")}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
       )}
     </ScrollView>
   );
@@ -337,20 +507,20 @@ const styles = StyleSheet.create({
   },
 
   conteudo: {
-    paddingTop: 10,
-    paddingBottom: 120,
+    paddingTop: 8,
+    paddingBottom: 110,
     backgroundColor: "#FFFFFF",
   },
 
   buscaBox: {
-    marginTop: 14,
+    marginTop: 10,
     marginHorizontal: 16,
-    height: 50,
-    borderRadius: 18,
+    height: 46,
+    borderRadius: 16,
     backgroundColor: "#F3F4F6",
     borderWidth: 1,
     borderColor: "#E5E7EB",
-    paddingHorizontal: 14,
+    paddingHorizontal: 13,
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
@@ -358,36 +528,147 @@ const styles = StyleSheet.create({
 
   buscaInput: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "700",
     color: "#111111",
   },
 
   secaoCabecalho: {
-    marginTop: 24,
+    marginTop: 18,
     marginHorizontal: 16,
-    marginBottom: 12,
+    marginBottom: 9,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
 
   secaoTitulo: {
-    fontSize: 21,
+    fontSize: 19,
     fontWeight: "900",
     color: "#111111",
   },
 
   verTudo: {
+    fontSize: 12,
+    fontWeight: "900",
+    color: "#1E3A8A",
+  },
+
+  listaHorizontal: {
+    paddingLeft: 16,
+    paddingRight: 8,
+    gap: 10,
+  },
+
+  cardAnuncio: {
+    width: CARD_WIDTH,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    overflow: "hidden",
+  },
+
+  cardAnuncioDestaque: {
+    borderColor: "#2B2F36",
+    borderWidth: 1.3,
+    shadowColor: "#0F172A",
+    shadowOffset: {
+      width: 0,
+      height: 7,
+    },
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+    elevation: 5,
+  },
+
+  imagemBox: {
+    position: "relative",
+    width: "100%",
+    height: 96,
+    backgroundColor: "#F3F4F6",
+  },
+
+  cardImagem: {
+    width: "100%",
+    height: "100%",
+    backgroundColor: "#F3F4F6",
+  },
+
+  cardImagemDestaque: {
+    opacity: 0.95,
+  },
+
+  overlayDestaque: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(15,23,42,0.12)",
+  },
+
+  estrelaBox: {
+    position: "absolute",
+    top: 7,
+    right: 7,
+    width: 20,
+    height: 20,
+    borderRadius: 999,
+    backgroundColor: "rgba(15,23,42,0.78)",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.12)",
+  },
+
+  cardInfo: {
+    padding: 9,
+  },
+
+  cardTitulo: {
+    fontSize: 13,
+    fontWeight: "900",
+    color: "#111111",
+  },
+
+  cardPreco: {
+    marginTop: 4,
     fontSize: 13,
     fontWeight: "900",
     color: "#1E3A8A",
   },
 
+  cardLocal: {
+    marginTop: 3,
+    fontSize: 11,
+    fontWeight: "700",
+    color: "#6B7280",
+  },
+
+  cardEvento: {
+    width: CARD_EVENTO_WIDTH,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    overflow: "hidden",
+  },
+
+  eventoImagem: {
+    width: "100%",
+    height: 92,
+    backgroundColor: "#F3F4F6",
+  },
+
+  eventoData: {
+    marginTop: 3,
+    fontSize: 11,
+    fontWeight: "800",
+    color: "#1E3A8A",
+  },
+
   carregandoBox: {
+    marginTop: 18,
     marginHorizontal: 16,
-    borderRadius: 20,
-    padding: 18,
+    borderRadius: 18,
+    padding: 16,
     backgroundColor: "#F9FAFB",
     borderWidth: 1,
     borderColor: "#E5E7EB",
@@ -397,15 +678,16 @@ const styles = StyleSheet.create({
   },
 
   carregandoTexto: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "700",
     color: "#6B7280",
   },
 
   vazioBox: {
+    marginTop: 18,
     marginHorizontal: 16,
-    borderRadius: 20,
-    padding: 18,
+    borderRadius: 18,
+    padding: 16,
     backgroundColor: "#F9FAFB",
     borderWidth: 1,
     borderColor: "#E5E7EB",
@@ -418,121 +700,10 @@ const styles = StyleSheet.create({
   },
 
   vazioTexto: {
-    marginTop: 6,
+    marginTop: 5,
     fontSize: 13,
     fontWeight: "600",
     color: "#6B7280",
-    lineHeight: 19,
-  },
-
-  listaHorizontal: {
-    paddingHorizontal: 16,
-    gap: 12,
-  },
-
-  cardDestaqueHorizontal: {
-    width: 300,
-    height: 200,
-    borderRadius: 22,
-    overflow: "hidden",
-    backgroundColor: "#F3F4F6",
-  },
-
-  cardImagemGrande: {
-    width: "100%",
-    height: "100%",
-  },
-
-  overlayGradiente: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: 82,
-    backgroundColor: "rgba(0,0,0,0.35)",
-  },
-
-  cardOverlay: {
-    position: "absolute",
-    bottom: 14,
-    left: 14,
-    right: 14,
-  },
-
-  cardTituloOverlay: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "900",
-  },
-
-  cardSubOverlay: {
-    marginTop: 4,
-    color: "#E5E7EB",
-    fontSize: 12,
-    fontWeight: "700",
-  },
-
-  cardHorizontal: {
-    width: 180,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    overflow: "hidden",
-  },
-
-  cardHorizontalImagem: {
-    width: "100%",
-    height: 120,
-    backgroundColor: "#F3F4F6",
-  },
-
-  cardHorizontalTitulo: {
-    marginTop: 10,
-    marginHorizontal: 12,
-    fontSize: 14,
-    fontWeight: "900",
-    color: "#111111",
-  },
-
-  cardHorizontalPreco: {
-    marginTop: 4,
-    marginHorizontal: 12,
-    marginBottom: 12,
-    fontSize: 14,
-    fontWeight: "900",
-    color: "#1E3A8A",
-  },
-
-  cardEvento: {
-    width: 230,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 22,
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    overflow: "hidden",
-  },
-
-  eventoImagem: {
-    width: "100%",
-    height: 130,
-    backgroundColor: "#F3F4F6",
-  },
-
-  eventoConteudo: {
-    padding: 12,
-  },
-
-  eventoTitulo: {
-    fontSize: 15,
-    fontWeight: "900",
-    color: "#111111",
-  },
-
-  eventoLocal: {
-    marginTop: 5,
-    fontSize: 12,
-    fontWeight: "700",
-    color: "#6B7280",
+    lineHeight: 18,
   },
 });

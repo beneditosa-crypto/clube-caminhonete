@@ -77,9 +77,9 @@ export default function MeusAnuncios() {
   }
 
   function corStatus(status?: string) {
-    if (status === "ATIVO") return "#22C55E"; // verde
-    if (status === "PENDENTE") return "#F59E0B"; // amarelo
-    if (status === "RECUSADO") return "#EF4444"; // vermelho
+    if (status === "ATIVO") return "#22C55E";
+    if (status === "PENDENTE") return "#F59E0B";
+    if (status === "RECUSADO") return "#EF4444";
     return "#9CA3AF";
   }
 
@@ -91,18 +91,14 @@ export default function MeusAnuncios() {
   }
 
   function confirmarExcluir(id: string) {
-    Alert.alert(
-      "Excluir anúncio",
-      "Deseja remover este anúncio?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Excluir",
-          style: "destructive",
-          onPress: () => excluirAnuncio(id),
-        },
-      ]
-    );
+    Alert.alert("Excluir anúncio", "Deseja remover este anúncio?", [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Excluir",
+        style: "destructive",
+        onPress: () => excluirAnuncio(id),
+      },
+    ]);
   }
 
   async function excluirAnuncio(id: string) {
@@ -117,7 +113,7 @@ export default function MeusAnuncios() {
 
   if (carregando) {
     return (
-      <View style={styles.container}>
+      <View style={styles.containerCarregando}>
         <ActivityIndicator size="large" color="#1E3A8A" />
       </View>
     );
@@ -145,6 +141,7 @@ export default function MeusAnuncios() {
                 : require("../../assets/images/logo.png")
             }
             style={styles.foto}
+            resizeMode="cover"
           />
 
           <View style={styles.infoBox}>
@@ -153,15 +150,13 @@ export default function MeusAnuncios() {
             </Text>
 
             <Text style={styles.info} numberOfLines={1}>
-              {[item.marca, item.modelo, item.ano].join(" • ")}
+              {[item.marca, item.modelo, item.ano].filter(Boolean).join(" • ")}
             </Text>
 
-            <Text style={styles.preco}>
-              {formatarPreco(item.preco)}
-            </Text>
+            <Text style={styles.preco}>{formatarPreco(item.preco)}</Text>
 
             <Text style={styles.local}>
-              {item.cidade} / {item.estado}
+              {item.cidade || "Cidade"} / {item.estado || "UF"}
             </Text>
 
             <View
@@ -170,9 +165,7 @@ export default function MeusAnuncios() {
                 { backgroundColor: corStatus(item.status) },
               ]}
             >
-              <Text style={styles.statusTexto}>
-                {textoStatus(item.status)}
-              </Text>
+              <Text style={styles.statusTexto}>{textoStatus(item.status)}</Text>
             </View>
 
             {item.status === "RECUSADO" && item.motivoPendencia ? (
@@ -183,6 +176,7 @@ export default function MeusAnuncios() {
               <TouchableOpacity
                 style={styles.botaoEditar}
                 onPress={() => router.push(`/publicar?id=${item.id}`)}
+                activeOpacity={0.85}
               >
                 <Text style={styles.botaoEditarTexto}>Editar</Text>
               </TouchableOpacity>
@@ -190,6 +184,7 @@ export default function MeusAnuncios() {
               <TouchableOpacity
                 style={styles.botaoExcluir}
                 onPress={() => confirmarExcluir(item.id)}
+                activeOpacity={0.85}
               >
                 <Text style={styles.botaoExcluirTexto}>Excluir</Text>
               </TouchableOpacity>
@@ -202,59 +197,77 @@ export default function MeusAnuncios() {
 }
 
 const styles = StyleSheet.create({
+  containerCarregando: {
+    paddingHorizontal: 14,
+    paddingVertical: 24,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
   container: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
+    paddingBottom: 90,
   },
 
   vazio: {
-    marginHorizontal: 16,
-    padding: 20,
+    marginHorizontal: 2,
+    padding: 18,
     borderRadius: 18,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: "#FFFFFF",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#ECEEF2",
   },
 
   vazioTitulo: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "900",
+    color: "#111827",
   },
 
   vazioTexto: {
-    marginTop: 6,
+    marginTop: 4,
     color: "#6B7280",
+    fontSize: 12,
+    textAlign: "center",
+    lineHeight: 18,
+    fontWeight: "600",
   },
 
   card: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    marginBottom: 16,
+    borderRadius: 18,
+    marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: "#ECEEF2",
     overflow: "hidden",
   },
 
   foto: {
     width: "100%",
-    height: 160,
+    height: 132,
   },
 
   infoBox: {
-    padding: 14,
+    padding: 12,
   },
 
   titulo: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "900",
+    color: "#111827",
   },
 
   info: {
     marginTop: 4,
     color: "#6B7280",
+    fontSize: 12,
+    fontWeight: "600",
   },
 
   preco: {
-    marginTop: 6,
-    fontSize: 16,
+    marginTop: 5,
+    fontSize: 15,
     fontWeight: "900",
     color: "#1E3A8A",
   },
@@ -262,58 +275,65 @@ const styles = StyleSheet.create({
   local: {
     marginTop: 2,
     color: "#6B7280",
+    fontSize: 12,
+    fontWeight: "600",
   },
 
   statusBox: {
     alignSelf: "flex-start",
-    marginTop: 10,
-    paddingHorizontal: 10,
+    marginTop: 9,
+    paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 999,
   },
 
   statusTexto: {
     color: "#FFFFFF",
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "900",
+    letterSpacing: 0.3,
   },
 
   motivo: {
     marginTop: 8,
     color: "#EF4444",
-    fontSize: 12,
+    fontSize: 11,
+    fontWeight: "700",
   },
 
   acoes: {
     flexDirection: "row",
     gap: 8,
-    marginTop: 12,
+    marginTop: 10,
   },
 
   botaoEditar: {
     flex: 1,
     backgroundColor: "#1E3A8A",
-    paddingVertical: 12,
-    borderRadius: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
     alignItems: "center",
   },
 
   botaoEditarTexto: {
     color: "#FFFFFF",
     fontWeight: "900",
+    fontSize: 12,
   },
 
   botaoExcluir: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "#EF4444",
-    paddingVertical: 12,
-    borderRadius: 12,
+    borderColor: "#FCA5A5",
+    paddingVertical: 8,
+    borderRadius: 10,
     alignItems: "center",
+    backgroundColor: "#FEF2F2",
   },
 
   botaoExcluirTexto: {
-    color: "#EF4444",
+    color: "#DC2626",
     fontWeight: "900",
+    fontSize: 12,
   },
 });

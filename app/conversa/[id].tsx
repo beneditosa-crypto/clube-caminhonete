@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -9,16 +10,19 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
+
+import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { User, onAuthStateChanged } from "firebase/auth";
 import {
   addDoc,
   collection,
   doc,
+  increment,
   onSnapshot,
-  orderBy,
   query,
   serverTimestamp,
   updateDoc,
@@ -33,14 +37,28 @@ type Mensagem = {
   conversaId?: string;
   texto?: string;
   autorEmail?: string;
+  criadoEm?: any;
+};
+
+type ConversaDados = {
+  anuncioTitulo?: string;
+  participantes?: string[];
+  compradorEmail?: string;
+  vendedorEmail?: string;
+  naoLidasComprador?: number;
+  naoLidasVendedor?: number;
 };
 
 export default function Conversa() {
   const params = useLocalSearchParams();
   const conversaId = typeof params.id === "string" ? params.id : "";
 
+  const scrollRef = useRef<ScrollView | null>(null);
+
   const [usuario, setUsuario] = useState<User | null>(null);
   const [carregandoUsuario, setCarregandoUsuario] = useState(true);
+  const [carregandoConversa, setCarregandoConversa] = useState(true);
+  const [conversa, setConversa] = useState<ConversaDados | null>(null);
   const [mensagens, setMensagens] = useState<Mensagem[]>([]);
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
@@ -59,24 +77,99 @@ export default function Conversa() {
   }, []);
 
   useEffect(() => {
-    if (!conversaId) return;
+    if (!conversaId || !usuario?.email) return;
+
+    const ref = doc(db, "conversas", conversaId);
+
+    const unsubscribe = onSnapshot(
+      ref,
+      async (snapshot) => {
+        if (!snapshot.exists()) {
+          setConversa(null);
+          setCarregandoConversa(false);
+          return;
+        }
+
+        const dados = snapshot.data() as ConversaDados;
+        const emailTratado = usuario.email?.trim().toLowerCase();
+
+        const autorizado = dados.participantes?.some(
+          (email) => email.trim().toLowerCase() === emailTratado
+        );
+
+        if (!autorizado) {
+          Alert.alert("Acesso negado", "Você não participa desta conversa.");
+          router.replace("/conversas");
+          return;
+        }
+
+        setConversa(dados);
+        setCarregandoConversa(false);
+
+        const compradorEmail = dados.compradorEmail?.trim().toLowerCase();
+        const vendedorEmail = dados.vendedorEmail?.trim().toLowerCase();
+
+        try {
+          if (emailTratado === compradorEmail && dados.naoLidasComprador) {
+            await updateDoc(ref, {
+              naoLidasComprador: 0,
+            });
+          }
+
+          if (emailTratado === vendedorEmail && dados.naoLidasVendedor) {
+            await updateDoc(ref, {
+              naoLidasVendedor: 0,
+            });
+          }
+        } catch {
+          // Não bloqueia a conversa se falhar ao limpar contador.
+        }
+      },
+      () => {
+        setCarregandoConversa(false);
+        Alert.alert("Erro", "Não foi possível carregar a conversa.");
+      }
+    );
+
+    return unsubscribe;
+  }, [conversaId, usuario]);
+
+  useEffect(() => {
+    if (!conversaId || !usuario?.email) return;
 
     const q = query(
       collection(db, "mensagens"),
       where("conversaId", "==", conversaId)
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const lista = snapshot.docs.map((documento) => ({
-        id: documento.id,
-        ...documento.data(),
-      })) as Mensagem[];
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const lista = snapshot.docs.map((documento) => ({
+          id: documento.id,
+          ...documento.data(),
+        })) as Mensagem[];
 
-      setMensagens(lista);
-    });
+        const ordenadas = lista.sort((a, b) => {
+          const dataA = a.criadoEm?.toMillis?.() || 0;
+          const dataB = b.criadoEm?.toMillis?.() || 0;
+
+          return dataA - dataB;
+        });
+
+        setMensagens(ordenadas);
+
+        setTimeout(() => {
+          scrollRef.current?.scrollToEnd({ animated: true });
+        }, 150);
+      },
+      () => {
+        Alert.alert("Erro", "Não foi possível carregar as mensagens.");
+      }
+    );
 
     return () => unsubscribe();
-  }, [conversaId]);
+  }, [conversaId, usuario]);
 
   async function enviarMensagem() {
     const textoTratado = texto.trim();
@@ -86,35 +179,75 @@ export default function Conversa() {
       return;
     }
 
-    if (!textoTratado) return;
+    if (!conversaId || !conversa) {
+      Alert.alert("Erro", "Conversa inválida.");
+      return;
+    }
+
+    if (!textoTratado || enviando) return;
 
     try {
       setEnviando(true);
 
+      const autorEmail = usuario.email.trim().toLowerCase();
+      const compradorEmail = conversa.compradorEmail?.trim().toLowerCase();
+      const vendedorEmail = conversa.vendedorEmail?.trim().toLowerCase();
+
+      const incrementoNaoLida =
+        autorEmail === compradorEmail
+          ? { naoLidasVendedor: increment(1) }
+          : autorEmail === vendedorEmail
+          ? { naoLidasComprador: increment(1) }
+          : {};
+
       await addDoc(collection(db, "mensagens"), {
         conversaId,
         texto: textoTratado,
-        autorEmail: usuario.email.toLowerCase(),
+        autorEmail,
         criadoEm: serverTimestamp(),
       });
 
       await updateDoc(doc(db, "conversas", conversaId), {
         ultimaMensagem: textoTratado,
         atualizadoEm: serverTimestamp(),
+        ...incrementoNaoLida,
       });
 
       setTexto("");
-    } catch (error) {
+    } catch {
       Alert.alert("Erro", "Não foi possível enviar a mensagem.");
     } finally {
       setEnviando(false);
     }
   }
 
-  if (carregandoUsuario) {
+  if (carregandoUsuario || carregandoConversa) {
     return (
       <View style={styles.centralizado}>
         <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={styles.loadingTexto}>Carregando conversa...</Text>
+      </View>
+    );
+  }
+
+  if (!conversa) {
+    return (
+      <View style={styles.centralizado}>
+        <Ionicons
+          name="chatbubble-ellipses-outline"
+          size={34}
+          color={colors.iconMuted}
+        />
+
+        <Text style={styles.indisponivelTitulo}>Conversa indisponível</Text>
+
+        <TouchableOpacity
+          style={styles.botaoVoltarLista}
+          onPress={() => router.replace("/conversas")}
+          activeOpacity={0.85}
+        >
+          <Text style={styles.botaoVoltarListaTexto}>Voltar para conversas</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -122,69 +255,112 @@ export default function Conversa() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 28 : 0}
     >
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.voltar}>Voltar</Text>
-        </TouchableOpacity>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.flex}>
+          <View style={styles.header}>
+            <TouchableOpacity
+              style={styles.voltarBotao}
+              onPress={() => router.back()}
+              activeOpacity={0.85}
+            >
+              <Ionicons name="chevron-back" size={22} color={colors.primary} />
+              <Text style={styles.voltarTexto}>Conversas</Text>
+            </TouchableOpacity>
 
-        <Text style={styles.titulo}>Conversa</Text>
-      </View>
-
-      <ScrollView
-        style={styles.lista}
-        contentContainerStyle={styles.listaConteudo}
-        showsVerticalScrollIndicator={false}
-      >
-        {mensagens.length === 0 && (
-          <View style={styles.vazio}>
-            <Text style={styles.vazioTitulo}>Nenhuma mensagem ainda</Text>
-            <Text style={styles.vazioTexto}>
-              Envie a primeira mensagem sobre este anúncio.
+            <Text style={styles.titulo} numberOfLines={1}>
+              {conversa.anuncioTitulo || "Conversa"}
             </Text>
           </View>
-        )}
 
-        {mensagens.map((mensagem) => {
-          const minha =
-            mensagem.autorEmail?.toLowerCase() ===
-            usuario?.email?.toLowerCase();
+          <ScrollView
+            ref={scrollRef}
+            style={styles.lista}
+            contentContainerStyle={styles.listaConteudo}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            onContentSizeChange={() =>
+              scrollRef.current?.scrollToEnd({ animated: true })
+            }
+          >
+            {mensagens.length === 0 && (
+              <View style={styles.vazio}>
+                <View style={styles.vazioIcone}>
+                  <Ionicons
+                    name="chatbubble-ellipses-outline"
+                    size={30}
+                    color={colors.primary}
+                  />
+                </View>
 
-          return (
-            <View
-              key={mensagem.id}
+                <Text style={styles.vazioTitulo}>Nenhuma mensagem ainda</Text>
+
+                <Text style={styles.vazioTexto}>
+                  Envie a primeira mensagem sobre este anúncio.
+                </Text>
+              </View>
+            )}
+
+            {mensagens.map((mensagem) => {
+              const minha =
+                mensagem.autorEmail?.trim().toLowerCase() ===
+                usuario?.email?.trim().toLowerCase();
+
+              return (
+                <View
+                  key={mensagem.id}
+                  style={[
+                    styles.balao,
+                    minha ? styles.balaoMeu : styles.balaoOutro,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.textoMensagem,
+                      minha ? styles.textoMeu : styles.textoOutro,
+                    ]}
+                  >
+                    {mensagem.texto}
+                  </Text>
+                </View>
+              );
+            })}
+          </ScrollView>
+
+          <View style={styles.caixa}>
+            <TextInput
+              style={styles.input}
+              placeholder="Digite sua mensagem..."
+              placeholderTextColor={colors.iconMuted}
+              value={texto}
+              onChangeText={setTexto}
+              multiline
+              returnKeyType="send"
+              blurOnSubmit={false}
+              onSubmitEditing={enviarMensagem}
+              textAlignVertical="center"
+            />
+
+            <TouchableOpacity
               style={[
-                styles.balao,
-                minha ? styles.balaoMeu : styles.balaoOutro,
+                styles.botaoEnviar,
+                (!texto.trim() || enviando) && styles.botaoDesativado,
               ]}
+              onPress={enviarMensagem}
+              disabled={!texto.trim() || enviando}
+              activeOpacity={0.85}
             >
-              <Text style={styles.texto}>{mensagem.texto}</Text>
-            </View>
-          );
-        })}
-      </ScrollView>
-
-      <View style={styles.caixa}>
-        <TextInput
-          style={styles.input}
-          placeholder="Digite sua mensagem..."
-          placeholderTextColor={colors.iconMuted}
-          value={texto}
-          onChangeText={setTexto}
-          multiline
-        />
-
-        <TouchableOpacity
-          style={[styles.botao, enviando && styles.botaoDesativado]}
-          onPress={enviarMensagem}
-          disabled={enviando}
-        >
-          <Text style={styles.botaoTexto}>
-            {enviando ? "..." : "Enviar"}
-          </Text>
-        </TouchableOpacity>
-      </View>
+              {enviando ? (
+                <ActivityIndicator color="#FFFFFF" size="small" />
+              ) : (
+                <Ionicons name="send" size={18} color="#FFFFFF" />
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 }
@@ -195,30 +371,70 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
 
+  flex: {
+    flex: 1,
+  },
+
   centralizado: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    padding: 24,
     backgroundColor: colors.background,
+  },
+
+  loadingTexto: {
+    marginTop: 10,
+    color: colors.textMuted,
+    fontSize: 14,
+    fontWeight: "700",
+  },
+
+  indisponivelTitulo: {
+    marginTop: 14,
+    fontSize: 19,
+    fontWeight: "900",
+    color: colors.text,
+    textAlign: "center",
+  },
+
+  botaoVoltarLista: {
+    marginTop: 18,
+    backgroundColor: colors.primary,
+    borderRadius: 14,
+    paddingHorizontal: 18,
+    paddingVertical: 13,
+  },
+
+  botaoVoltarListaTexto: {
+    color: "#FFFFFF",
+    fontWeight: "900",
   },
 
   header: {
     paddingTop: 48,
-    paddingHorizontal: 20,
+    paddingHorizontal: 18,
     paddingBottom: 14,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
     backgroundColor: colors.background,
   },
 
-  voltar: {
-    color: colors.primary,
-    fontWeight: "900",
+  voltarBotao: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
     marginBottom: 8,
   },
 
+  voltarTexto: {
+    color: colors.primary,
+    fontWeight: "900",
+    fontSize: 14,
+  },
+
   titulo: {
-    fontSize: 24,
+    fontSize: 21,
     fontWeight: "900",
     color: colors.text,
   },
@@ -228,13 +444,23 @@ const styles = StyleSheet.create({
   },
 
   listaConteudo: {
-    padding: 20,
-    paddingBottom: 30,
+    padding: 18,
+    paddingBottom: 28,
   },
 
   vazio: {
     alignItems: "center",
-    marginTop: 80,
+    marginTop: 70,
+  },
+
+  vazioIcone: {
+    width: 58,
+    height: 58,
+    borderRadius: 20,
+    backgroundColor: "#EEF2FF",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 14,
   },
 
   vazioTitulo: {
@@ -248,11 +474,14 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     marginTop: 8,
     textAlign: "center",
+    lineHeight: 20,
+    fontWeight: "600",
   },
 
   balao: {
     maxWidth: "82%",
-    padding: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 11,
     borderRadius: 18,
     marginBottom: 10,
   },
@@ -260,19 +489,27 @@ const styles = StyleSheet.create({
   balaoMeu: {
     alignSelf: "flex-end",
     backgroundColor: colors.primary,
-    borderBottomRightRadius: 4,
+    borderBottomRightRadius: 5,
   },
 
   balaoOutro: {
     alignSelf: "flex-start",
     backgroundColor: "#F3F4F6",
-    borderBottomLeftRadius: 4,
+    borderBottomLeftRadius: 5,
   },
 
-  texto: {
-    color: "#FFFFFF",
+  textoMensagem: {
     fontSize: 15,
+    lineHeight: 21,
     fontWeight: "700",
+  },
+
+  textoMeu: {
+    color: "#FFFFFF",
+  },
+
+  textoOutro: {
+    color: colors.text,
   },
 
   caixa: {
@@ -280,8 +517,8 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     gap: 10,
     paddingHorizontal: 14,
-    paddingTop: 14,
-    paddingBottom: 100,
+    paddingTop: 12,
+    paddingBottom: Platform.OS === "ios" ? 28 : 18,
     borderTopWidth: 1,
     borderTopColor: colors.border,
     backgroundColor: colors.background,
@@ -289,30 +526,29 @@ const styles = StyleSheet.create({
 
   input: {
     flex: 1,
+    minHeight: 48,
     maxHeight: 110,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 16,
+    borderRadius: 18,
     paddingHorizontal: 14,
     paddingVertical: 12,
     color: colors.text,
     fontSize: 15,
+    fontWeight: "600",
   },
 
-  botao: {
+  botaoEnviar: {
+    width: 48,
+    height: 48,
+    borderRadius: 17,
     backgroundColor: colors.primary,
-    paddingHorizontal: 18,
-    paddingVertical: 13,
-    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   botaoDesativado: {
-    opacity: 0.6,
-  },
-
-  botaoTexto: {
-    color: "#FFFFFF",
-    fontWeight: "900",
+    opacity: 0.45,
   },
 });

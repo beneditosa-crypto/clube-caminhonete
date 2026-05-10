@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
 import {
   collection,
   doc,
@@ -16,6 +17,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
+
 import { router } from "expo-router";
 
 import { db } from "../services/firebase";
@@ -32,6 +34,7 @@ type Anuncio = {
 
 export default function MeusAnuncios() {
   const { usuario } = useAuth();
+
   const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
 
   useEffect(() => {
@@ -64,11 +67,11 @@ export default function MeusAnuncios() {
       case "ATIVO":
         return "Aprovado";
       case "PENDENTE":
-        return "Pendente de análise";
+        return "Em análise";
       case "RECUSADO":
         return "Recusado";
       default:
-        return "Em análise";
+        return "Análise";
     }
   }
 
@@ -86,18 +89,17 @@ export default function MeusAnuncios() {
   }
 
   function confirmarExclusao(id: string) {
-    Alert.alert(
-      "Excluir anúncio",
-      "Deseja realmente excluir este anúncio?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Excluir",
-          style: "destructive",
-          onPress: () => excluirAnuncio(id),
-        },
-      ]
-    );
+    Alert.alert("Excluir anúncio", "Deseja realmente excluir este anúncio?", [
+      {
+        text: "Cancelar",
+        style: "cancel",
+      },
+      {
+        text: "Excluir",
+        style: "destructive",
+        onPress: () => excluirAnuncio(id),
+      },
+    ]);
   }
 
   async function excluirAnuncio(id: string) {
@@ -120,6 +122,7 @@ export default function MeusAnuncios() {
     >
       <View style={styles.header}>
         <Text style={styles.titulo}>Meus anúncios</Text>
+
         <Text style={styles.subtitulo}>
           Acompanhe seus anúncios enviados para análise.
         </Text>
@@ -136,8 +139,9 @@ export default function MeusAnuncios() {
       {anuncios.length === 0 && (
         <View style={styles.vazioBox}>
           <Text style={styles.vazioTitulo}>Nenhum anúncio cadastrado</Text>
+
           <Text style={styles.vazioTexto}>
-            Quando você publicar um veículo, ele aparecerá aqui com o status da análise.
+            Quando você publicar um veículo, ele aparecerá aqui.
           </Text>
         </View>
       )}
@@ -145,18 +149,25 @@ export default function MeusAnuncios() {
       {anuncios.map((item) => (
         <View key={item.id} style={styles.card}>
           <View style={styles.cardTopo}>
-            <Text style={styles.nome}>
+            <Text style={styles.nome} numberOfLines={2}>
               {item.titulo || "Anúncio sem título"}
             </Text>
 
             <View
               style={[
                 styles.statusBox,
-                { backgroundColor: `${corStatus(item.status)}22` },
+                {
+                  backgroundColor: `${corStatus(item.status)}18`,
+                },
               ]}
             >
               <Text
-                style={[styles.status, { color: corStatus(item.status) }]}
+                style={[
+                  styles.status,
+                  {
+                    color: corStatus(item.status),
+                  },
+                ]}
               >
                 {textoStatus(item.status)}
               </Text>
@@ -167,21 +178,23 @@ export default function MeusAnuncios() {
             <Text style={styles.motivo}>{item.motivoPendencia}</Text>
           )}
 
-          <TouchableOpacity
-            style={styles.botaoEditar}
-            onPress={() => router.push(`/publicar?id=${item.id}`)}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.textoBotao}>Editar</Text>
-          </TouchableOpacity>
+          <View style={styles.linhaBotoes}>
+            <TouchableOpacity
+              style={styles.botaoEditar}
+              onPress={() => router.push(`/publicar?id=${item.id}`)}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.textoBotao}>Editar</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.botaoExcluir}
-            onPress={() => confirmarExclusao(item.id)}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.textoExcluir}>Excluir</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.botaoExcluir}
+              onPress={() => confirmarExclusao(item.id)}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.textoExcluir}>Excluir</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       ))}
     </ScrollView>
@@ -195,62 +208,65 @@ const styles = StyleSheet.create({
   },
 
   conteudo: {
-    padding: 20,
-    paddingBottom: 130,
+    paddingHorizontal: 14,
+    paddingTop: 10,
+    paddingBottom: 90,
   },
 
   header: {
-    marginBottom: 18,
+    marginBottom: 10,
   },
 
   titulo: {
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: "900",
     color: colors.text,
+    marginBottom: 2,
+    letterSpacing: -0.4,
   },
 
   subtitulo: {
-    marginTop: 6,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 11,
+    lineHeight: 16,
     color: colors.textMuted,
     fontWeight: "600",
   },
 
   botaoNovo: {
     backgroundColor: colors.primary,
-    paddingVertical: 16,
-    borderRadius: 14,
+    paddingVertical: 11,
+    borderRadius: 12,
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 12,
   },
 
   textoBotaoNovo: {
     color: "#FFFFFF",
     fontWeight: "900",
-    fontSize: 16,
+    fontSize: 13,
+    letterSpacing: 0.2,
   },
 
   vazioBox: {
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 18,
-    padding: 20,
+    borderRadius: 16,
+    padding: 16,
     alignItems: "center",
     backgroundColor: "#FFFFFF",
   },
 
   vazioTitulo: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: "900",
     color: colors.text,
-    marginBottom: 8,
+    marginBottom: 4,
     textAlign: "center",
   },
 
   vazioTexto: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 12,
+    lineHeight: 17,
     color: colors.textMuted,
     textAlign: "center",
     fontWeight: "600",
@@ -259,66 +275,80 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "#FFFFFF",
     borderRadius: 18,
-    padding: 18,
-    marginBottom: 16,
+    padding: 12,
+    marginBottom: 10,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: "#ECEEF2",
   },
 
   cardTopo: {
-    gap: 10,
+    gap: 6,
   },
 
   nome: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: "900",
     color: colors.text,
+    lineHeight: 18,
+    letterSpacing: -0.2,
   },
 
   statusBox: {
     alignSelf: "flex-start",
-    paddingHorizontal: 12,
-    paddingVertical: 7,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
     borderRadius: 999,
   },
 
   status: {
     fontWeight: "900",
-    fontSize: 13,
+    fontSize: 10,
+    letterSpacing: 0.3,
   },
 
   motivo: {
-    marginTop: 12,
-    fontSize: 14,
-    lineHeight: 20,
+    marginTop: 8,
+    fontSize: 11,
+    lineHeight: 16,
     color: colors.textMuted,
     fontWeight: "600",
   },
 
+  linhaBotoes: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 10,
+  },
+
   botaoEditar: {
-    backgroundColor: colors.primary,
-    paddingVertical: 14,
-    borderRadius: 14,
+    flex: 1,
+    backgroundColor: "#111827",
+    paddingVertical: 8,
+    borderRadius: 10,
     alignItems: "center",
-    marginTop: 16,
   },
 
   textoBotao: {
     color: "#FFFFFF",
-    fontWeight: "900",
+    fontWeight: "800",
+    fontSize: 12,
+    letterSpacing: 0.2,
   },
 
   botaoExcluir: {
-    marginTop: 10,
+    flex: 1,
     borderWidth: 1,
-    borderColor: colors.border,
-    paddingVertical: 14,
-    borderRadius: 14,
+    borderColor: "#E5E7EB",
+    paddingVertical: 8,
+    borderRadius: 10,
     alignItems: "center",
+    backgroundColor: "#FFFFFF",
   },
 
   textoExcluir: {
-    color: colors.textMuted,
-    fontWeight: "900",
+    color: "#6B7280",
+    fontWeight: "800",
+    fontSize: 12,
+    letterSpacing: 0.2,
   },
 });

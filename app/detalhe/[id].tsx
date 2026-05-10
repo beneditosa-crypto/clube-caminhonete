@@ -163,6 +163,10 @@ export default function DetalheAnuncio() {
           email={anuncio.usuarioEmail}
           telefone={anuncio.telefone}
           titulo={anuncio.titulo}
+          preco={anuncio.preco}
+          cidade={anuncio.cidade}
+          estado={anuncio.estado}
+          foto={anuncio.fotos?.[0]}
         />
       </View>
 

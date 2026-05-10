@@ -59,31 +59,35 @@ const styles = StyleSheet.create({
   },
 
   conteudo: {
-    paddingBottom: 130,
+    paddingBottom: 120,
     backgroundColor: "#FFFFFF",
   },
 
   acaoBox: {
-    marginTop: 12,
-    marginHorizontal: 16,
+    marginTop: 8,
+    marginHorizontal: 14,
+    alignItems: "center",
   },
 
   botao: {
     backgroundColor: "#1E3A8A",
-    paddingVertical: 15,
-    borderRadius: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 12,
     alignItems: "center",
+    alignSelf: "center",
+    minWidth: 170,
   },
 
   botaoTexto: {
     color: "#FFFFFF",
     fontWeight: "900",
-    fontSize: 15,
+    fontSize: 13,
   },
 
   subTexto: {
-    marginTop: 8,
-    fontSize: 12,
+    marginTop: 7,
+    fontSize: 11,
     fontWeight: "600",
     color: "#6B7280",
     textAlign: "center",

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+
 import {
   ActivityIndicator,
   Alert,
@@ -8,6 +9,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
+import { router } from "expo-router";
+
 import {
   collection,
   doc,
@@ -62,9 +66,9 @@ export default function MeusEventos() {
   }, []);
 
   function corStatus(status?: string) {
-    if (status === "ATIVO") return "#22C55E"; // verde
-    if (status === "PENDENTE") return "#F59E0B"; // amarelo
-    if (status === "RECUSADO") return "#EF4444"; // vermelho
+    if (status === "ATIVO") return "#22C55E";
+    if (status === "PENDENTE") return "#F59E0B";
+    if (status === "RECUSADO") return "#EF4444";
     return "#9CA3AF";
   }
 
@@ -77,7 +81,10 @@ export default function MeusEventos() {
 
   async function excluir(id: string) {
     Alert.alert("Excluir evento?", "Deseja realmente excluir este evento?", [
-      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Cancelar",
+        style: "cancel",
+      },
       {
         text: "Excluir",
         style: "destructive",
@@ -92,7 +99,7 @@ export default function MeusEventos() {
 
   if (carregando) {
     return (
-      <View style={styles.container}>
+      <View style={styles.containerCarregando}>
         <ActivityIndicator size="large" color="#1E3A8A" />
       </View>
     );
@@ -102,6 +109,7 @@ export default function MeusEventos() {
     return (
       <View style={styles.vazio}>
         <Text style={styles.vazioTitulo}>Nenhum evento ainda</Text>
+
         <Text style={styles.vazioTexto}>
           Crie seu primeiro evento para começar
         </Text>
@@ -116,10 +124,13 @@ export default function MeusEventos() {
           <Image
             source={
               item.fotos?.[0]
-                ? { uri: item.fotos[0] }
+                ? {
+                    uri: item.fotos[0],
+                  }
                 : require("../../assets/images/logo.png")
             }
             style={styles.foto}
+            resizeMode="cover"
           />
 
           <View style={styles.infoBox}>
@@ -132,28 +143,35 @@ export default function MeusEventos() {
             </Text>
 
             <Text style={styles.local}>
-              {item.cidade} / {item.estado}
+              {item.cidade || "Cidade"} / {item.estado || "UF"}
             </Text>
 
             <View
               style={[
                 styles.statusBox,
-                { backgroundColor: corStatus(item.status) },
+                {
+                  backgroundColor: corStatus(item.status),
+                },
               ]}
             >
-              <Text style={styles.statusTexto}>
-                {textoStatus(item.status)}
-              </Text>
+              <Text style={styles.statusTexto}>{textoStatus(item.status)}</Text>
             </View>
 
             <View style={styles.acoes}>
-              <TouchableOpacity style={styles.botaoEditar}>
+              <TouchableOpacity
+                style={styles.botaoEditar}
+                onPress={() =>
+                  router.push(`/publicar-evento?id=${item.id}` as any)
+                }
+                activeOpacity={0.85}
+              >
                 <Text style={styles.botaoEditarTexto}>Editar</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.botaoExcluir}
                 onPress={() => excluir(item.id)}
+                activeOpacity={0.85}
               >
                 <Text style={styles.botaoExcluirTexto}>Excluir</Text>
               </TouchableOpacity>
@@ -166,105 +184,129 @@ export default function MeusEventos() {
 }
 
 const styles = StyleSheet.create({
+  containerCarregando: {
+    paddingHorizontal: 14,
+    paddingVertical: 24,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
   container: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
+    paddingBottom: 90,
   },
 
   vazio: {
-    marginHorizontal: 16,
-    padding: 20,
+    marginHorizontal: 2,
+    padding: 18,
     borderRadius: 18,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: "#FFFFFF",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#ECEEF2",
   },
 
   vazioTitulo: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "900",
+    color: "#111827",
   },
 
   vazioTexto: {
-    marginTop: 6,
+    marginTop: 4,
     color: "#6B7280",
+    fontSize: 12,
+    textAlign: "center",
+    lineHeight: 18,
+    fontWeight: "600",
   },
 
   card: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    marginBottom: 16,
+    borderRadius: 18,
+    marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: "#ECEEF2",
     overflow: "hidden",
   },
 
   foto: {
     width: "100%",
-    height: 150,
+    height: 132,
   },
 
   infoBox: {
-    padding: 14,
+    padding: 12,
   },
 
   titulo: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "900",
+    color: "#111827",
   },
 
   info: {
     marginTop: 4,
     color: "#6B7280",
+    fontSize: 12,
+    fontWeight: "600",
   },
 
   local: {
     marginTop: 2,
     color: "#6B7280",
+    fontSize: 12,
+    fontWeight: "600",
   },
 
   statusBox: {
     alignSelf: "flex-start",
-    marginTop: 10,
-    paddingHorizontal: 10,
+    marginTop: 9,
+    paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 999,
   },
 
   statusTexto: {
     color: "#FFFFFF",
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "900",
+    letterSpacing: 0.3,
   },
 
   acoes: {
     flexDirection: "row",
     gap: 8,
-    marginTop: 12,
+    marginTop: 10,
   },
 
   botaoEditar: {
     flex: 1,
     backgroundColor: "#1E3A8A",
-    paddingVertical: 12,
-    borderRadius: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
     alignItems: "center",
   },
 
   botaoEditarTexto: {
     color: "#FFFFFF",
     fontWeight: "900",
+    fontSize: 12,
   },
 
   botaoExcluir: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "#EF4444",
-    paddingVertical: 12,
-    borderRadius: 12,
+    borderColor: "#FCA5A5",
+    paddingVertical: 8,
+    borderRadius: 10,
     alignItems: "center",
+    backgroundColor: "#FEF2F2",
   },
 
   botaoExcluirTexto: {
-    color: "#EF4444",
+    color: "#DC2626",
     fontWeight: "900",
+    fontSize: 12,
   },
 });
