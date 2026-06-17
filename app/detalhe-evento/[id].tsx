@@ -1,3 +1,6 @@
+import { Ionicons } from "@expo/vector-icons";
+import { router, useLocalSearchParams } from "expo-router";
+import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -11,14 +14,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useLocalSearchParams, router } from "expo-router";
-import { doc, getDoc } from "firebase/firestore";
-import { Ionicons } from "@expo/vector-icons";
 
 import { db } from "../../services/firebase";
 
-import AppHeader from "../../components/layout/AppHeader";
 import BotaoVoltar from "../../components/detalhe/BotaoVoltar";
+import AppHeader from "../../components/layout/AppHeader";
 
 type Evento = {
   id: string;
@@ -80,6 +80,25 @@ export default function DetalheEvento() {
     }
   }
 
+  function criarSlug(texto: string) {
+    return texto
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
+  function montarUrlEvento() {
+    if (!evento) return "https://volante.app.br";
+
+    const titulo = evento.titulo || "evento";
+    const slug = criarSlug(titulo) || "evento";
+
+    return `https://volante.app.br/evento/${slug}-${evento.id}`;
+  }
+
   function montarTextoEvento() {
     const titulo = evento?.titulo || "Evento";
     const data = evento?.data || "Data em breve";
@@ -87,7 +106,9 @@ export default function DetalheEvento() {
       [evento?.cidade, evento?.estado].filter(Boolean).join(" / ") ||
       "Local a confirmar";
 
-    return `🚗 ${titulo}\n\n📅 ${data}\n📍 ${local}\n\nVi este evento no Volante.`;
+    const url = montarUrlEvento();
+
+    return `🚗 ${titulo}\n\n📅 ${data}\n📍 ${local}\n\nVi este evento no Volante.\n${url}`;
   }
 
   async function abrirLink() {
@@ -111,6 +132,7 @@ export default function DetalheEvento() {
 
     await Share.share({
       message: montarTextoEvento(),
+      url: montarUrlEvento(),
     });
   }
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   Alert,
@@ -83,6 +83,31 @@ export default function PublicarEvento() {
 
   const [modalEstado, setModalEstado] = useState(false);
   const [modalCidade, setModalCidade] = useState(false);
+
+  const [buscaEstado, setBuscaEstado] = useState("");
+  const [buscaCidade, setBuscaCidade] = useState("");
+
+  const estadosFiltrados = useMemo(() => {
+    const termo = buscaEstado.trim().toLowerCase();
+
+    if (!termo) return estados;
+
+    return estados.filter((item) => {
+      const texto = `${item.nome} ${item.sigla}`.toLowerCase();
+
+      return texto.includes(termo);
+    });
+  }, [estados, buscaEstado]);
+
+  const cidadesFiltradas = useMemo(() => {
+    const termo = buscaCidade.trim().toLowerCase();
+
+    if (!termo) return cidades;
+
+    return cidades.filter((item) =>
+      item.nome.toLowerCase().includes(termo)
+    );
+  }, [cidades, buscaCidade]);
 
   useEffect(() => {
     if (!carregando && !usuario) {
@@ -240,7 +265,7 @@ export default function PublicarEvento() {
       setFotos(Array.isArray(dados.fotos) ? dados.fotos : []);
 
       if (dados.estado) {
-        buscarCidades(dados.estado);
+        buscarCidades(dados.estado, false);
       }
     } catch {
       Alert.alert("Erro", "Não foi possível carregar o evento.");
@@ -261,10 +286,14 @@ export default function PublicarEvento() {
     }
   }
 
-  async function buscarCidades(sigla: string) {
+  async function buscarCidades(sigla: string, limparCidade = true) {
     try {
-      setCidade("");
+      if (limparCidade) {
+        setCidade("");
+      }
+
       setCidades([]);
+      setBuscaCidade("");
 
       const resposta = await fetch(
         `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${sigla}/municipios?orderBy=nome`
@@ -485,18 +514,16 @@ export default function PublicarEvento() {
         contentContainerStyle={styles.conteudo}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.cabecalho}>
-          <Text style={styles.titulo}>
-            {editando ? "Editar evento" : "Cadastrar evento"}
-          </Text>
+        <Text style={styles.titulo}>
+          {editando ? "Editar evento" : "Cadastrar evento"}
+        </Text>
 
-          <Text style={styles.subtitulo}>
-            Eventos enviados passam por análise antes de aparecerem no Volante.
-          </Text>
-        </View>
+        <Text style={styles.subtitulo}>
+          Eventos enviados passam por análise antes de aparecerem no Volante.
+        </Text>
 
         <View style={styles.bloco}>
-          <Text style={styles.blocoTitulo}>Dados do evento</Text>
+          <Text style={styles.blocoTitulo}>DADOS DO EVENTO</Text>
 
           <TextInput
             style={styles.input}
@@ -516,68 +543,60 @@ export default function PublicarEvento() {
             textAlignVertical="top"
           />
 
-          <View style={styles.linha}>
-            <TouchableOpacity
-              style={[styles.select, styles.inputLinha]}
-              onPress={() => setPickerAtivo("dataInicio")}
-            >
-              <Text
-                style={dataInicio ? styles.selectTexto : styles.placeholder}
-                numberOfLines={1}
-              >
-                {dataInicio
-                  ? `Início: ${formatarDataBR(dataInicio)}`
-                  : "Data início"}
-              </Text>
-            </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.select}
+            onPress={() => setPickerAtivo("dataInicio")}
+          >
+            <Text style={dataInicio ? styles.selectTexto : styles.placeholder}>
+              {dataInicio
+                ? `Data de início: ${formatarDataBR(dataInicio)}`
+                : "Selecionar data de início"}
+            </Text>
+          </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[styles.select, styles.inputLinha]}
-              onPress={() => setPickerAtivo("dataFim")}
-            >
-              <Text
-                style={dataFim ? styles.selectTexto : styles.placeholder}
-                numberOfLines={1}
-              >
-                {dataFim ? `Fim: ${formatarDataBR(dataFim)}` : "Data fim"}
-              </Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={styles.select}
+            onPress={() => setPickerAtivo("dataFim")}
+          >
+            <Text style={dataFim ? styles.selectTexto : styles.placeholder}>
+              {dataFim
+                ? `Data de fim: ${formatarDataBR(dataFim)}`
+                : "Selecionar data de fim"}
+            </Text>
+          </TouchableOpacity>
 
           <View style={styles.switchLinha}>
-            <Text style={styles.switchTexto}>Dia inteiro</Text>
+            <Text style={styles.switchTexto}>Evento o dia inteiro</Text>
 
             <Switch value={diaInteiro} onValueChange={setDiaInteiro} />
           </View>
 
           {!diaInteiro && (
-            <View style={styles.linha}>
+            <>
               <TouchableOpacity
-                style={[styles.select, styles.inputLinha]}
+                style={styles.select}
                 onPress={() => setPickerAtivo("horaInicio")}
               >
                 <Text
                   style={horaInicio ? styles.selectTexto : styles.placeholder}
-                  numberOfLines={1}
                 >
                   {horaInicio
-                    ? `Início: ${formatarHora(horaInicio)}`
-                    : "Hora início"}
+                    ? `Hora de início: ${formatarHora(horaInicio)}`
+                    : "Selecionar hora de início"}
                 </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.select, styles.inputLinha]}
+                style={styles.select}
                 onPress={() => setPickerAtivo("horaFim")}
               >
-                <Text
-                  style={horaFim ? styles.selectTexto : styles.placeholder}
-                  numberOfLines={1}
-                >
-                  {horaFim ? `Fim: ${formatarHora(horaFim)}` : "Hora fim"}
+                <Text style={horaFim ? styles.selectTexto : styles.placeholder}>
+                  {horaFim
+                    ? `Hora de fim: ${formatarHora(horaFim)}`
+                    : "Selecionar hora de fim"}
                 </Text>
               </TouchableOpacity>
-            </View>
+            </>
           )}
 
           <TextInput
@@ -592,40 +611,36 @@ export default function PublicarEvento() {
         </View>
 
         <View style={styles.bloco}>
-          <Text style={styles.blocoTitulo}>Localização</Text>
+          <Text style={styles.blocoTitulo}>LOCALIZAÇÃO</Text>
 
-          <View style={styles.linha}>
-            <TouchableOpacity
-              style={[styles.select, styles.inputLinha]}
-              onPress={() => setModalEstado(true)}
-            >
-              <Text
-                style={estado ? styles.selectTexto : styles.placeholder}
-                numberOfLines={1}
-              >
-                {estado || "Estado"}
-              </Text>
-            </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.select}
+            onPress={() => {
+              setBuscaEstado("");
+              setModalEstado(true);
+            }}
+          >
+            <Text style={estado ? styles.selectTexto : styles.placeholder}>
+              {estado || "Selecionar estado"}
+            </Text>
+          </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[styles.select, styles.inputLinha]}
-              onPress={() => {
-                if (!estado) {
-                  Alert.alert("Atenção", "Selecione primeiro o estado.");
-                  return;
-                }
+          <TouchableOpacity
+            style={styles.select}
+            onPress={() => {
+              if (!estado) {
+                Alert.alert("Atenção", "Selecione primeiro o estado.");
+                return;
+              }
 
-                setModalCidade(true);
-              }}
-            >
-              <Text
-                style={cidade ? styles.selectTexto : styles.placeholder}
-                numberOfLines={1}
-              >
-                {cidade || "Cidade"}
-              </Text>
-            </TouchableOpacity>
-          </View>
+              setBuscaCidade("");
+              setModalCidade(true);
+            }}
+          >
+            <Text style={cidade ? styles.selectTexto : styles.placeholder}>
+              {cidade || "Selecionar cidade"}
+            </Text>
+          </TouchableOpacity>
 
           <TextInput
             style={styles.input}
@@ -637,31 +652,26 @@ export default function PublicarEvento() {
         </View>
 
         <View style={styles.bloco}>
-          <View style={styles.blocoHeader}>
-            <Text style={styles.blocoTitulo}>Fotos</Text>
-            <Text style={styles.contadorFotos}>{fotos.length}/6</Text>
-          </View>
+          <Text style={styles.blocoTitulo}>FOTOS</Text>
 
           <TouchableOpacity style={styles.botaoFoto} onPress={escolherFotos}>
             <Text style={styles.textoBotaoFoto}>Adicionar fotos</Text>
           </TouchableOpacity>
 
-          {fotos.length > 0 && (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {fotos.map((foto, index) => (
-                <View key={`${foto}-${index}`} style={styles.fotoBox}>
-                  <Image source={{ uri: foto }} style={styles.foto} />
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {fotos.map((foto, index) => (
+              <View key={`${foto}-${index}`} style={styles.fotoBox}>
+                <Image source={{ uri: foto }} style={styles.foto} />
 
-                  <TouchableOpacity
-                    style={styles.removerFoto}
-                    onPress={() => removerFoto(index)}
-                  >
-                    <Text style={styles.removerFotoTexto}>×</Text>
-                  </TouchableOpacity>
-                </View>
-              ))}
-            </ScrollView>
-          )}
+                <TouchableOpacity
+                  style={styles.removerFoto}
+                  onPress={() => removerFoto(index)}
+                >
+                  <Text style={styles.removerFotoTexto}>X</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </ScrollView>
         </View>
 
         <TouchableOpacity
@@ -710,13 +720,25 @@ export default function PublicarEvento() {
         <View style={styles.modalContainer}>
           <Text style={styles.modalTitulo}>Selecionar estado</Text>
 
+          <TextInput
+            style={styles.inputBuscaModal}
+            placeholder="Buscar estado"
+            placeholderTextColor={colors.iconMuted}
+            value={buscaEstado}
+            onChangeText={setBuscaEstado}
+            autoFocus
+          />
+
           <ScrollView showsVerticalScrollIndicator={false}>
-            {estados.map((item) => (
+            {estadosFiltrados.map((item) => (
               <TouchableOpacity
                 key={item.id}
                 style={styles.itemLista}
                 onPress={() => {
                   setEstado(item.sigla);
+                  setCidade("");
+                  setBuscaEstado("");
+                  setBuscaCidade("");
                   setModalEstado(false);
                   buscarCidades(item.sigla);
                 }}
@@ -726,11 +748,18 @@ export default function PublicarEvento() {
                 </Text>
               </TouchableOpacity>
             ))}
+
+            {estadosFiltrados.length === 0 && (
+              <Text style={styles.semResultado}>Nenhum estado encontrado.</Text>
+            )}
           </ScrollView>
 
           <TouchableOpacity
             style={styles.botaoFecharModal}
-            onPress={() => setModalEstado(false)}
+            onPress={() => {
+              setBuscaEstado("");
+              setModalEstado(false);
+            }}
           >
             <Text style={styles.textoFecharModal}>Fechar</Text>
           </TouchableOpacity>
@@ -741,24 +770,41 @@ export default function PublicarEvento() {
         <View style={styles.modalContainer}>
           <Text style={styles.modalTitulo}>Selecionar cidade</Text>
 
+          <TextInput
+            style={styles.inputBuscaModal}
+            placeholder="Buscar cidade"
+            placeholderTextColor={colors.iconMuted}
+            value={buscaCidade}
+            onChangeText={setBuscaCidade}
+            autoFocus
+          />
+
           <ScrollView showsVerticalScrollIndicator={false}>
-            {cidades.map((item) => (
+            {cidadesFiltradas.map((item) => (
               <TouchableOpacity
                 key={item.id}
                 style={styles.itemLista}
                 onPress={() => {
                   setCidade(item.nome);
+                  setBuscaCidade("");
                   setModalCidade(false);
                 }}
               >
                 <Text style={styles.itemTexto}>{item.nome}</Text>
               </TouchableOpacity>
             ))}
+
+            {cidadesFiltradas.length === 0 && (
+              <Text style={styles.semResultado}>Nenhuma cidade encontrada.</Text>
+            )}
           </ScrollView>
 
           <TouchableOpacity
             style={styles.botaoFecharModal}
-            onPress={() => setModalCidade(false)}
+            onPress={() => {
+              setBuscaCidade("");
+              setModalCidade(false);
+            }}
           >
             <Text style={styles.textoFecharModal}>Fechar</Text>
           </TouchableOpacity>
@@ -775,9 +821,8 @@ const styles = StyleSheet.create({
   },
 
   conteudo: {
-    paddingHorizontal: 16,
-    paddingTop: 14,
-    paddingBottom: 96,
+    padding: 20,
+    paddingBottom: 120,
   },
 
   centralizado: {
@@ -789,95 +834,77 @@ const styles = StyleSheet.create({
   },
 
   carregando: {
-    fontSize: 14,
+    fontSize: 16,
     color: colors.text,
     fontWeight: "700",
   },
 
-  cabecalho: {
-    marginBottom: 12,
-  },
-
   titulo: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "900",
     color: colors.text,
-    marginBottom: 4,
+    marginBottom: 8,
   },
 
   subtitulo: {
-    fontSize: 12,
+    fontSize: 14,
     color: colors.textMuted,
-    lineHeight: 17,
+    marginBottom: 20,
+    lineHeight: 20,
     fontWeight: "600",
   },
 
   bloco: {
     backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: 12,
-    marginBottom: 10,
+    borderRadius: 20,
+    padding: 16,
+    marginBottom: 16,
     borderWidth: 1,
     borderColor: colors.border,
   },
 
-  blocoHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-
   blocoTitulo: {
-    fontSize: 13,
+    fontSize: 17,
     fontWeight: "900",
     color: colors.text,
-    marginBottom: 10,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
-
-  contadorFotos: {
-    fontSize: 12,
-    color: colors.textMuted,
-    fontWeight: "800",
-    marginBottom: 10,
-  },
-
-  linha: {
-    flexDirection: "row",
-    gap: 8,
-  },
-
-  inputLinha: {
-    flex: 1,
+    marginBottom: 14,
   },
 
   input: {
     backgroundColor: colors.surface,
-    borderRadius: 12,
-    paddingHorizontal: 13,
-    paddingVertical: 10,
-    minHeight: 42,
-    fontSize: 14,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 15,
     color: colors.text,
-    marginBottom: 8,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+
+  inputBuscaModal: {
+    backgroundColor: colors.surface,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 15,
+    color: colors.text,
+    marginBottom: 12,
     borderWidth: 1,
     borderColor: colors.border,
     fontWeight: "600",
   },
 
   textArea: {
-    height: 82,
-    paddingTop: 10,
+    height: 120,
   },
 
   switchLinha: {
     backgroundColor: colors.surface,
-    borderRadius: 12,
-    paddingHorizontal: 13,
-    paddingVertical: 8,
-    minHeight: 42,
-    marginBottom: 8,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginBottom: 12,
     borderWidth: 1,
     borderColor: colors.border,
     flexDirection: "row",
@@ -886,54 +913,52 @@ const styles = StyleSheet.create({
   },
 
   switchTexto: {
-    fontSize: 14,
+    fontSize: 15,
     color: colors.text,
     fontWeight: "700",
   },
 
   select: {
     backgroundColor: colors.surface,
-    borderRadius: 12,
-    paddingHorizontal: 13,
-    paddingVertical: 10,
-    minHeight: 42,
-    marginBottom: 8,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    marginBottom: 12,
     borderWidth: 1,
     borderColor: colors.border,
-    justifyContent: "center",
   },
 
   selectTexto: {
     color: colors.text,
-    fontSize: 14,
-    fontWeight: "700",
+    fontSize: 15,
+    fontWeight: "600",
   },
 
   placeholder: {
     color: colors.iconMuted,
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: 15,
   },
 
   botaoFoto: {
     backgroundColor: colors.primary,
-    borderRadius: 12,
-    paddingVertical: 11,
+    borderRadius: 14,
+    paddingVertical: 14,
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 14,
   },
 
   textoBotaoFoto: {
     color: "#FFFFFF",
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "900",
   },
 
   fotoBox: {
-    width: 92,
-    height: 68,
-    marginRight: 8,
-    borderRadius: 12,
+    width: 120,
+    height: 90,
+    marginRight: 10,
+    marginBottom: 4,
+    borderRadius: 14,
     overflow: "hidden",
     backgroundColor: "#F3F4F6",
   },
@@ -945,11 +970,11 @@ const styles = StyleSheet.create({
 
   removerFoto: {
     position: "absolute",
-    top: 5,
-    right: 5,
-    width: 22,
-    height: 22,
-    borderRadius: 11,
+    top: 6,
+    right: 6,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     backgroundColor: colors.danger,
     alignItems: "center",
     justifyContent: "center",
@@ -957,17 +982,16 @@ const styles = StyleSheet.create({
 
   removerFotoTexto: {
     color: "#FFFFFF",
-    fontSize: 16,
-    lineHeight: 18,
+    fontSize: 12,
     fontWeight: "900",
   },
 
   botaoPrimario: {
     backgroundColor: colors.primary,
-    borderRadius: 14,
-    paddingVertical: 13,
+    borderRadius: 16,
+    paddingVertical: 16,
     alignItems: "center",
-    marginTop: 4,
+    marginTop: 8,
   },
 
   botaoDesativado: {
@@ -976,18 +1000,18 @@ const styles = StyleSheet.create({
 
   textoBotao: {
     color: "#FFFFFF",
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "900",
   },
 
   botaoSecundario: {
-    paddingVertical: 13,
+    paddingVertical: 16,
     alignItems: "center",
   },
 
   textoBotaoSecundario: {
     color: colors.textMuted,
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "800",
   },
 
@@ -997,57 +1021,64 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     backgroundColor: colors.background,
-    padding: 14,
+    padding: 16,
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
 
   botaoFecharPicker: {
     backgroundColor: colors.primary,
-    borderRadius: 14,
-    paddingVertical: 13,
+    borderRadius: 16,
+    paddingVertical: 14,
     alignItems: "center",
   },
 
   modalContainer: {
     flex: 1,
     backgroundColor: colors.background,
-    paddingTop: 42,
-    paddingHorizontal: 16,
-    paddingBottom: 20,
+    paddingTop: 48,
+    paddingHorizontal: 20,
+    paddingBottom: 24,
   },
 
   modalTitulo: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: "900",
     color: colors.text,
-    marginBottom: 12,
+    marginBottom: 16,
   },
 
   itemLista: {
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    paddingVertical: 15,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
 
   itemTexto: {
     color: colors.text,
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: 16,
+    fontWeight: "700",
+  },
+
+  semResultado: {
+    color: colors.textMuted,
+    fontSize: 15,
+    fontWeight: "700",
+    textAlign: "center",
+    marginTop: 24,
   },
 
   botaoFecharModal: {
     backgroundColor: colors.primary,
-    borderRadius: 14,
-    paddingVertical: 13,
+    borderRadius: 16,
+    paddingVertical: 14,
     alignItems: "center",
-    marginTop: 14,
+    marginTop: 16,
   },
 
   textoFecharModal: {
     color: "#FFFFFF",
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "900",
   },
 });

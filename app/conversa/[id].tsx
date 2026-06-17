@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+
 import {
   ActivityIndicator,
   Alert,
@@ -15,10 +16,20 @@ import {
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
-import { router, useLocalSearchParams } from "expo-router";
-import { User, onAuthStateChanged } from "firebase/auth";
+
+import {
+  router,
+  useLocalSearchParams,
+} from "expo-router";
+
+import {
+  User,
+  onAuthStateChanged,
+} from "firebase/auth";
+
 import {
   addDoc,
+  arrayUnion,
   collection,
   doc,
   increment,
@@ -30,6 +41,11 @@ import {
 } from "firebase/firestore";
 
 import { auth, db } from "../../services/firebase";
+
+import {
+  notificarMensagemLocal,
+} from "../../services/notificacoes";
+
 import { colors } from "../../utils/theme";
 
 type Mensagem = {
@@ -41,31 +57,63 @@ type Mensagem = {
 };
 
 type ConversaDados = {
+  anuncioId?: string;
   anuncioTitulo?: string;
-  participantes?: string[];
+  anuncioPreco?: string;
+  anuncioCidade?: string;
+  anuncioEstado?: string;
   compradorEmail?: string;
   vendedorEmail?: string;
+  participantes?: string[];
   naoLidasComprador?: number;
   naoLidasVendedor?: number;
+  ocultoPara?: string[];
 };
+
+function formatarHorario(valor: any) {
+  try {
+    const data = valor?.toDate?.();
+
+    if (!data) return "";
+
+    return data.toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return "";
+  }
+}
 
 export default function Conversa() {
   const params = useLocalSearchParams();
-  const conversaId = typeof params.id === "string" ? params.id : "";
+
+  const conversaId =
+    typeof params.id === "string" ? params.id : "";
 
   const scrollRef = useRef<ScrollView | null>(null);
 
   const [usuario, setUsuario] = useState<User | null>(null);
-  const [carregandoUsuario, setCarregandoUsuario] = useState(true);
-  const [carregandoConversa, setCarregandoConversa] = useState(true);
-  const [conversa, setConversa] = useState<ConversaDados | null>(null);
+
+  const [carregandoUsuario, setCarregandoUsuario] =
+    useState(true);
+
+  const [carregandoConversa, setCarregandoConversa] =
+    useState(true);
+
+  const [conversa, setConversa] =
+    useState<ConversaDados | null>(null);
+
   const [mensagens, setMensagens] = useState<Mensagem[]>([]);
+
   const [texto, setTexto] = useState("");
+
   const [enviando, setEnviando] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUsuario(user);
+
       setCarregandoUsuario(false);
 
       if (!user) {
@@ -77,128 +125,160 @@ export default function Conversa() {
   }, []);
 
   useEffect(() => {
-    if (!conversaId || !usuario?.email) return;
+    if (!conversaId || !usuario?.email) {
+      return;
+    }
 
     const ref = doc(db, "conversas", conversaId);
 
-    const unsubscribe = onSnapshot(
-      ref,
-      async (snapshot) => {
-        if (!snapshot.exists()) {
-          setConversa(null);
-          setCarregandoConversa(false);
-          return;
-        }
-
-        const dados = snapshot.data() as ConversaDados;
-        const emailTratado = usuario.email?.trim().toLowerCase();
-
-        const autorizado = dados.participantes?.some(
-          (email) => email.trim().toLowerCase() === emailTratado
-        );
-
-        if (!autorizado) {
-          Alert.alert("Acesso negado", "Você não participa desta conversa.");
-          router.replace("/conversas");
-          return;
-        }
-
-        setConversa(dados);
+    const unsubscribe = onSnapshot(ref, async (snapshot) => {
+      if (!snapshot.exists()) {
+        setConversa(null);
         setCarregandoConversa(false);
-
-        const compradorEmail = dados.compradorEmail?.trim().toLowerCase();
-        const vendedorEmail = dados.vendedorEmail?.trim().toLowerCase();
-
-        try {
-          if (emailTratado === compradorEmail && dados.naoLidasComprador) {
-            await updateDoc(ref, {
-              naoLidasComprador: 0,
-            });
-          }
-
-          if (emailTratado === vendedorEmail && dados.naoLidasVendedor) {
-            await updateDoc(ref, {
-              naoLidasVendedor: 0,
-            });
-          }
-        } catch {
-          // Não bloqueia a conversa se falhar ao limpar contador.
-        }
-      },
-      () => {
-        setCarregandoConversa(false);
-        Alert.alert("Erro", "Não foi possível carregar a conversa.");
+        return;
       }
-    );
+
+      const dados = snapshot.data() as ConversaDados;
+
+      setConversa(dados);
+
+      setCarregandoConversa(false);
+
+      const emailTratado =
+        usuario.email?.trim().toLowerCase() || "";
+
+      const compradorEmail =
+        dados.compradorEmail?.trim().toLowerCase();
+
+      const vendedorEmail =
+        dados.vendedorEmail?.trim().toLowerCase();
+
+      try {
+        if (
+          emailTratado === compradorEmail &&
+          dados.naoLidasComprador
+        ) {
+          await updateDoc(ref, {
+            naoLidasComprador: 0,
+          });
+        }
+
+        if (
+          emailTratado === vendedorEmail &&
+          dados.naoLidasVendedor
+        ) {
+          await updateDoc(ref, {
+            naoLidasVendedor: 0,
+          });
+        }
+      } catch {}
+    });
 
     return unsubscribe;
   }, [conversaId, usuario]);
 
   useEffect(() => {
-    if (!conversaId || !usuario?.email) return;
+    if (!conversaId) {
+      return;
+    }
 
     const q = query(
       collection(db, "mensagens"),
       where("conversaId", "==", conversaId)
     );
 
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot) => {
-        const lista = snapshot.docs.map((documento) => ({
-          id: documento.id,
-          ...documento.data(),
-        })) as Mensagem[];
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const lista = snapshot.docs.map((documento) => ({
+        id: documento.id,
+        ...documento.data(),
+      })) as Mensagem[];
 
-        const ordenadas = lista.sort((a, b) => {
-          const dataA = a.criadoEm?.toMillis?.() || 0;
-          const dataB = b.criadoEm?.toMillis?.() || 0;
+      const ordenadas = lista.sort((a, b) => {
+        const dataA = a.criadoEm?.toMillis?.() || 0;
+        const dataB = b.criadoEm?.toMillis?.() || 0;
 
-          return dataA - dataB;
+        return dataA - dataB;
+      });
+
+      setMensagens(ordenadas);
+
+      setTimeout(() => {
+        scrollRef.current?.scrollToEnd({
+          animated: true,
         });
+      }, 120);
+    });
 
-        setMensagens(ordenadas);
+    return unsubscribe;
+  }, [conversaId]);
 
-        setTimeout(() => {
-          scrollRef.current?.scrollToEnd({ animated: true });
-        }, 150);
-      },
-      () => {
-        Alert.alert("Erro", "Não foi possível carregar as mensagens.");
-      }
+  async function excluirConversa() {
+    const emailTratado =
+      usuario?.email?.trim().toLowerCase() || "";
+
+    if (!emailTratado || !conversaId) {
+      return;
+    }
+
+    Alert.alert(
+      "Excluir conversa",
+      "Deseja remover esta conversa da sua lista?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await updateDoc(doc(db, "conversas", conversaId), {
+                ocultoPara: arrayUnion(emailTratado),
+              });
+
+              router.back();
+            } catch {
+              Alert.alert(
+                "Erro",
+                "Não foi possível excluir a conversa."
+              );
+            }
+          },
+        },
+      ]
     );
-
-    return () => unsubscribe();
-  }, [conversaId, usuario]);
+  }
 
   async function enviarMensagem() {
     const textoTratado = texto.trim();
 
-    if (!usuario?.email) {
-      router.replace("/login");
+    const autorEmail =
+      usuario?.email?.trim().toLowerCase() || "";
+
+    if (!textoTratado || !conversaId || !autorEmail || enviando) {
       return;
     }
-
-    if (!conversaId || !conversa) {
-      Alert.alert("Erro", "Conversa inválida.");
-      return;
-    }
-
-    if (!textoTratado || enviando) return;
 
     try {
       setEnviando(true);
 
-      const autorEmail = usuario.email.trim().toLowerCase();
-      const compradorEmail = conversa.compradorEmail?.trim().toLowerCase();
-      const vendedorEmail = conversa.vendedorEmail?.trim().toLowerCase();
+      const compradorEmail =
+        conversa?.compradorEmail?.trim().toLowerCase();
+
+      const vendedorEmail =
+        conversa?.vendedorEmail?.trim().toLowerCase();
 
       const incrementoNaoLida =
         autorEmail === compradorEmail
-          ? { naoLidasVendedor: increment(1) }
+          ? {
+              naoLidasVendedor: increment(1),
+            }
           : autorEmail === vendedorEmail
-          ? { naoLidasComprador: increment(1) }
-          : {};
+            ? {
+                naoLidasComprador: increment(1),
+              }
+            : {};
 
       await addDoc(collection(db, "mensagens"), {
         conversaId,
@@ -210,12 +290,27 @@ export default function Conversa() {
       await updateDoc(doc(db, "conversas", conversaId), {
         ultimaMensagem: textoTratado,
         atualizadoEm: serverTimestamp(),
+        ocultoPara: [],
         ...incrementoNaoLida,
       });
 
+      const outroUsuario =
+        autorEmail === compradorEmail ? vendedorEmail : compradorEmail;
+
+      if (outroUsuario) {
+        await notificarMensagemLocal(
+          conversa?.anuncioTitulo || "Nova mensagem",
+          textoTratado
+        );
+      }
+
       setTexto("");
-    } catch {
-      Alert.alert("Erro", "Não foi possível enviar a mensagem.");
+
+      setTimeout(() => {
+        scrollRef.current?.scrollToEnd({
+          animated: true,
+        });
+      }, 120);
     } finally {
       setEnviando(false);
     }
@@ -223,31 +318,10 @@ export default function Conversa() {
 
   if (carregandoUsuario || carregandoConversa) {
     return (
-      <View style={styles.centralizado}>
+      <View style={styles.loading}>
         <ActivityIndicator size="large" color={colors.primary} />
+
         <Text style={styles.loadingTexto}>Carregando conversa...</Text>
-      </View>
-    );
-  }
-
-  if (!conversa) {
-    return (
-      <View style={styles.centralizado}>
-        <Ionicons
-          name="chatbubble-ellipses-outline"
-          size={34}
-          color={colors.iconMuted}
-        />
-
-        <Text style={styles.indisponivelTitulo}>Conversa indisponível</Text>
-
-        <TouchableOpacity
-          style={styles.botaoVoltarLista}
-          onPress={() => router.replace("/conversas")}
-          activeOpacity={0.85}
-        >
-          <Text style={styles.botaoVoltarListaTexto}>Voltar para conversas</Text>
-        </TouchableOpacity>
       </View>
     );
   }
@@ -261,17 +335,52 @@ export default function Conversa() {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.flex}>
           <View style={styles.header}>
-            <TouchableOpacity
-              style={styles.voltarBotao}
-              onPress={() => router.back()}
-              activeOpacity={0.85}
-            >
-              <Ionicons name="chevron-back" size={22} color={colors.primary} />
-              <Text style={styles.voltarTexto}>Conversas</Text>
-            </TouchableOpacity>
+            <View style={styles.topoHeader}>
+              <TouchableOpacity
+                style={styles.voltar}
+                onPress={() => router.back()}
+              >
+                <Ionicons
+                  name="chevron-back"
+                  size={22}
+                  color={colors.primary}
+                />
 
-            <Text style={styles.titulo} numberOfLines={1}>
-              {conversa.anuncioTitulo || "Conversa"}
+                <Text style={styles.voltarTexto}>Conversas</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.botaoExcluir}
+                onPress={excluirConversa}
+              >
+                <Ionicons
+                  name="trash-outline"
+                  size={18}
+                  color="#DC2626"
+                />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.titulo}>
+              {conversa?.anuncioTitulo || "Conversa"}
+            </Text>
+          </View>
+
+          <View style={styles.cardAnuncio}>
+            <Text style={styles.cardLabel}>Conversa sobre anúncio</Text>
+
+            <Text style={styles.cardTitulo} numberOfLines={1}>
+              {conversa?.anuncioTitulo || "Veículo anunciado"}
+            </Text>
+
+            <Text style={styles.cardInfo}>
+              {conversa?.anuncioPreco || ""}
+              {conversa?.anuncioCidade
+                ? ` • ${conversa.anuncioCidade}`
+                : ""}
+              {conversa?.anuncioEstado
+                ? ` - ${conversa.anuncioEstado}`
+                : ""}
             </Text>
           </View>
 
@@ -280,29 +389,7 @@ export default function Conversa() {
             style={styles.lista}
             contentContainerStyle={styles.listaConteudo}
             showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-            onContentSizeChange={() =>
-              scrollRef.current?.scrollToEnd({ animated: true })
-            }
           >
-            {mensagens.length === 0 && (
-              <View style={styles.vazio}>
-                <View style={styles.vazioIcone}>
-                  <Ionicons
-                    name="chatbubble-ellipses-outline"
-                    size={30}
-                    color={colors.primary}
-                  />
-                </View>
-
-                <Text style={styles.vazioTitulo}>Nenhuma mensagem ainda</Text>
-
-                <Text style={styles.vazioTexto}>
-                  Envie a primeira mensagem sobre este anúncio.
-                </Text>
-              </View>
-            )}
-
             {mensagens.map((mensagem) => {
               const minha =
                 mensagem.autorEmail?.trim().toLowerCase() ===
@@ -312,18 +399,34 @@ export default function Conversa() {
                 <View
                   key={mensagem.id}
                   style={[
-                    styles.balao,
-                    minha ? styles.balaoMeu : styles.balaoOutro,
+                    styles.balaoWrap,
+                    minha ? styles.balaoWrapMeu : styles.balaoWrapOutro,
                   ]}
                 >
-                  <Text
+                  <View
                     style={[
-                      styles.textoMensagem,
-                      minha ? styles.textoMeu : styles.textoOutro,
+                      styles.balao,
+                      minha ? styles.balaoMeu : styles.balaoOutro,
                     ]}
                   >
-                    {mensagem.texto}
-                  </Text>
+                    <Text
+                      style={[
+                        styles.textoMensagem,
+                        minha ? styles.textoMeu : styles.textoOutro,
+                      ]}
+                    >
+                      {mensagem.texto}
+                    </Text>
+
+                    <Text
+                      style={[
+                        styles.horario,
+                        minha ? styles.horarioMeu : styles.horarioOutro,
+                      ]}
+                    >
+                      {formatarHorario(mensagem.criadoEm)}
+                    </Text>
+                  </View>
                 </View>
               );
             })}
@@ -333,14 +436,10 @@ export default function Conversa() {
             <TextInput
               style={styles.input}
               placeholder="Digite sua mensagem..."
-              placeholderTextColor={colors.iconMuted}
+              placeholderTextColor={colors.textMuted}
               value={texto}
               onChangeText={setTexto}
               multiline
-              returnKeyType="send"
-              blurOnSubmit={false}
-              onSubmitEditing={enviarMensagem}
-              textAlignVertical="center"
             />
 
             <TouchableOpacity
@@ -348,12 +447,11 @@ export default function Conversa() {
                 styles.botaoEnviar,
                 (!texto.trim() || enviando) && styles.botaoDesativado,
               ]}
-              onPress={enviarMensagem}
               disabled={!texto.trim() || enviando}
-              activeOpacity={0.85}
+              onPress={enviarMensagem}
             >
               {enviando ? (
-                <ActivityIndicator color="#FFFFFF" size="small" />
+                <ActivityIndicator size="small" color="#FFFFFF" />
               ) : (
                 <Ionicons name="send" size={18} color="#FFFFFF" />
               )}
@@ -375,40 +473,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  centralizado: {
+  loading: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    padding: 24,
     backgroundColor: colors.background,
   },
 
   loadingTexto: {
     marginTop: 10,
     color: colors.textMuted,
-    fontSize: 14,
     fontWeight: "700",
-  },
-
-  indisponivelTitulo: {
-    marginTop: 14,
-    fontSize: 19,
-    fontWeight: "900",
-    color: colors.text,
-    textAlign: "center",
-  },
-
-  botaoVoltarLista: {
-    marginTop: 18,
-    backgroundColor: colors.primary,
-    borderRadius: 14,
-    paddingHorizontal: 18,
-    paddingVertical: 13,
-  },
-
-  botaoVoltarListaTexto: {
-    color: "#FFFFFF",
-    fontWeight: "900",
   },
 
   header: {
@@ -417,14 +492,18 @@ const styles = StyleSheet.create({
     paddingBottom: 14,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
-    backgroundColor: colors.background,
   },
 
-  voltarBotao: {
+  topoHeader: {
     flexDirection: "row",
     alignItems: "center",
-    alignSelf: "flex-start",
-    marginBottom: 8,
+    justifyContent: "space-between",
+  },
+
+  voltar: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
   },
 
   voltarTexto: {
@@ -433,10 +512,52 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 
+  botaoExcluir: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: "#F9FAFB",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
   titulo: {
-    fontSize: 21,
+    fontSize: 22,
     fontWeight: "900",
     color: colors.text,
+  },
+
+  cardAnuncio: {
+    marginHorizontal: 18,
+    marginTop: 14,
+    backgroundColor: "#F9FAFB",
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 18,
+    padding: 14,
+  },
+
+  cardLabel: {
+    fontSize: 11,
+    fontWeight: "900",
+    color: colors.textMuted,
+    textTransform: "uppercase",
+  },
+
+  cardTitulo: {
+    marginTop: 5,
+    fontSize: 16,
+    fontWeight: "900",
+    color: colors.text,
+  },
+
+  cardInfo: {
+    marginTop: 4,
+    fontSize: 13,
+    color: colors.textMuted,
+    fontWeight: "700",
   },
 
   lista: {
@@ -448,52 +569,33 @@ const styles = StyleSheet.create({
     paddingBottom: 28,
   },
 
-  vazio: {
-    alignItems: "center",
-    marginTop: 70,
+  balaoWrap: {
+    width: "100%",
+    marginBottom: 10,
   },
 
-  vazioIcone: {
-    width: 58,
-    height: 58,
-    borderRadius: 20,
-    backgroundColor: "#EEF2FF",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 14,
+  balaoWrapMeu: {
+    alignItems: "flex-end",
   },
 
-  vazioTitulo: {
-    fontSize: 18,
-    fontWeight: "900",
-    color: colors.text,
-  },
-
-  vazioTexto: {
-    fontSize: 14,
-    color: colors.textMuted,
-    marginTop: 8,
-    textAlign: "center",
-    lineHeight: 20,
-    fontWeight: "600",
+  balaoWrapOutro: {
+    alignItems: "flex-start",
   },
 
   balao: {
     maxWidth: "82%",
     paddingHorizontal: 14,
-    paddingVertical: 11,
+    paddingTop: 11,
+    paddingBottom: 8,
     borderRadius: 18,
-    marginBottom: 10,
   },
 
   balaoMeu: {
-    alignSelf: "flex-end",
     backgroundColor: colors.primary,
     borderBottomRightRadius: 5,
   },
 
   balaoOutro: {
-    alignSelf: "flex-start",
     backgroundColor: "#F3F4F6",
     borderBottomLeftRadius: 5,
   },
@@ -510,6 +612,21 @@ const styles = StyleSheet.create({
 
   textoOutro: {
     color: colors.text,
+  },
+
+  horario: {
+    marginTop: 5,
+    fontSize: 10,
+    fontWeight: "800",
+    alignSelf: "flex-end",
+  },
+
+  horarioMeu: {
+    color: "rgba(255,255,255,0.72)",
+  },
+
+  horarioOutro: {
+    color: colors.textMuted,
   },
 
   caixa: {

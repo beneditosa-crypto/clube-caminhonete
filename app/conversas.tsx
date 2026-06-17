@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+
 import {
   ActivityIndicator,
   Alert,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -10,47 +12,92 @@ import {
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
+
 import { router } from "expo-router";
-import { onAuthStateChanged, User } from "firebase/auth";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+
+import {
+  arrayUnion,
+  collection,
+  doc,
+  onSnapshot,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 
 import AppHeader from "../components/layout/AppHeader";
-import { auth, db } from "../services/firebase";
+
+import { useAuth } from "../contexts/AuthContext";
+
+import { db } from "../services/firebase";
+
 import { colors } from "../utils/theme";
 
 type Conversa = {
   id: string;
+
+  anuncioId?: string;
+
   anuncioTitulo?: string;
+
+  anuncioPreco?: string;
+
+  anuncioCidade?: string;
+
+  anuncioEstado?: string;
+
+  anuncioFoto?: string;
+
   ultimaMensagem?: string;
+
   participantes?: string[];
+
   compradorEmail?: string;
+
   vendedorEmail?: string;
+
   naoLidasComprador?: number;
+
   naoLidasVendedor?: number;
+
   atualizadoEm?: any;
+
+  ocultoPara?: string[];
 };
 
-export default function Conversas() {
-  const [usuario, setUsuario] = useState<User | null>(null);
-  const [conversas, setConversas] = useState<Conversa[]>([]);
-  const [carregando, setCarregando] = useState(true);
+function formatarHorario(valor: any) {
+  try {
+    const data = valor?.toDate?.();
 
-  useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-      setUsuario(user);
+    if (!data) return "";
 
-      if (!user?.email) {
-        setConversas([]);
-        setCarregando(false);
-        router.replace("/login");
-      }
+    return data.toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
     });
+  } catch {
+    return "";
+  }
+}
 
-    return unsubscribeAuth;
-  }, []);
+export default function Conversas() {
+  const { usuario, carregando } = useAuth();
+
+  const [conversas, setConversas] = useState<Conversa[]>([]);
+
+  const [carregandoConversas, setCarregandoConversas] =
+    useState(true);
 
   useEffect(() => {
-    if (!usuario?.email) return;
+    if (!carregando && !usuario?.email) {
+      router.replace("/login");
+    }
+  }, [usuario, carregando]);
+
+  useEffect(() => {
+    if (carregando || !usuario?.email) {
+      return;
+    }
 
     const emailTratado = usuario.email.trim().toLowerCase();
 
@@ -62,10 +109,18 @@ export default function Conversas() {
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        const lista = snapshot.docs.map((documento) => ({
-          id: documento.id,
-          ...documento.data(),
-        })) as Conversa[];
+        const lista = snapshot.docs
+          .map((documento) => ({
+            id: documento.id,
+            ...documento.data(),
+          }))
+          .filter((item: any) => {
+            const ocultoPara = (item.ocultoPara || []).map((email: string) =>
+              email.trim().toLowerCase()
+            );
+
+            return !ocultoPara.includes(emailTratado);
+          }) as Conversa[];
 
         const ordenadas = lista.sort((a, b) => {
           const dataA = a.atualizadoEm?.toMillis?.() || 0;
@@ -75,20 +130,24 @@ export default function Conversas() {
         });
 
         setConversas(ordenadas);
-        setCarregando(false);
+
+        setCarregandoConversas(false);
       },
       () => {
-        setCarregando(false);
+        setCarregandoConversas(false);
+
         Alert.alert("Erro", "Não foi possível carregar as conversas.");
       }
     );
 
     return unsubscribe;
-  }, [usuario]);
+  }, [usuario, carregando]);
 
   function obterNaoLidas(item: Conversa) {
     const emailTratado = usuario?.email?.trim().toLowerCase();
+
     const compradorEmail = item.compradorEmail?.trim().toLowerCase();
+
     const vendedorEmail = item.vendedorEmail?.trim().toLowerCase();
 
     if (emailTratado === compradorEmail) {
@@ -102,17 +161,54 @@ export default function Conversas() {
     return 0;
   }
 
-  if (carregando) {
+  async function excluirConversa(conversaId: string) {
+    const emailTratado = usuario?.email?.trim().toLowerCase();
+
+    if (!emailTratado) {
+      return;
+    }
+
+    Alert.alert(
+      "Excluir conversa",
+      "Deseja remover esta conversa da sua lista?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await updateDoc(doc(db, "conversas", conversaId), {
+                ocultoPara: arrayUnion(emailTratado),
+              });
+            } catch {
+              Alert.alert("Erro", "Não foi possível excluir a conversa.");
+            }
+          },
+        },
+      ]
+    );
+  }
+
+  if (carregando || carregandoConversas) {
     return (
       <View style={styles.container}>
         <AppHeader titulo="Conversas" />
 
         <View style={styles.loadingBox}>
           <ActivityIndicator color={colors.primary} />
+
           <Text style={styles.loadingTexto}>Carregando conversas...</Text>
         </View>
       </View>
     );
+  }
+
+  if (!usuario) {
+    return null;
   }
 
   return (
@@ -136,75 +232,89 @@ export default function Conversas() {
           <Text style={styles.vazioTitulo}>Nenhuma conversa ainda</Text>
 
           <Text style={styles.vazioTexto}>
-            Quando você enviar ou receber mensagens sobre um anúncio, elas
-            aparecerão aqui.
+            Quando você enviar ou receber mensagens, elas aparecerão aqui.
           </Text>
         </View>
       ) : (
         <View style={styles.lista}>
           {conversas.map((item) => {
             const naoLidas = obterNaoLidas(item);
+
             const temNaoLidas = naoLidas > 0;
 
             return (
-              <TouchableOpacity
-                key={item.id}
-                style={[styles.card, temNaoLidas && styles.cardNovo]}
-                activeOpacity={0.85}
-                onPress={() => router.push(`/conversa/${item.id}` as any)}
-              >
-                <View
-                  style={[
-                    styles.cardIcone,
-                    temNaoLidas && styles.cardIconeNovo,
-                  ]}
+              <View key={item.id} style={styles.cardLinha}>
+                <TouchableOpacity
+                  style={[styles.card, temNaoLidas && styles.cardNovo]}
+                  activeOpacity={0.85}
+                  onPress={() => router.push(`/conversa/${item.id}` as any)}
                 >
-                  <Ionicons
-                    name={
-                      temNaoLidas
-                        ? "chatbubble-ellipses"
-                        : "chatbubble-ellipses-outline"
-                    }
-                    size={20}
-                    color="#FFFFFF"
+                  <Image
+                    source={{
+                      uri:
+                        item.anuncioFoto ||
+                        "https://volante.app.br/assets/logo.png",
+                    }}
+                    style={styles.foto}
                   />
-                </View>
 
-                <View style={styles.cardInfo}>
-                  <View style={styles.tituloLinha}>
-                    <Text
-                      style={[styles.titulo, temNaoLidas && styles.tituloNovo]}
-                      numberOfLines={1}
-                    >
-                      {item.anuncioTitulo || "Conversa"}
+                  <View style={styles.cardInfo}>
+                    <View style={styles.tituloLinha}>
+                      <Text
+                        style={[
+                          styles.titulo,
+                          temNaoLidas && styles.tituloNovo,
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {item.anuncioTitulo || "Conversa"}
+                      </Text>
+
+                      {temNaoLidas && (
+                        <View style={styles.badge}>
+                          <Text style={styles.badgeTexto}>
+                            {naoLidas > 9 ? "9+" : naoLidas}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+
+                    <Text style={styles.infoAnuncio} numberOfLines={1}>
+                      {item.anuncioPreco || ""}
+                      {item.anuncioCidade ? ` • ${item.anuncioCidade}` : ""}
+                      {item.anuncioEstado ? ` - ${item.anuncioEstado}` : ""}
                     </Text>
 
-                    {temNaoLidas && (
-                      <View style={styles.badge}>
-                        <Text style={styles.badgeTexto}>
-                          {naoLidas > 9 ? "9+" : naoLidas}
-                        </Text>
-                      </View>
-                    )}
+                    <Text
+                      style={[
+                        styles.mensagem,
+                        temNaoLidas && styles.mensagemNova,
+                      ]}
+                      numberOfLines={2}
+                    >
+                      {item.ultimaMensagem || "Toque para abrir a conversa."}
+                    </Text>
+
+                    <Text style={styles.horario}>
+                      {formatarHorario(item.atualizadoEm)}
+                    </Text>
                   </View>
 
-                  <Text
-                    style={[
-                      styles.mensagem,
-                      temNaoLidas && styles.mensagemNova,
-                    ]}
-                    numberOfLines={2}
-                  >
-                    {item.ultimaMensagem || "Toque para iniciar a conversa."}
-                  </Text>
-                </View>
+                  <Ionicons
+                    name="chevron-forward"
+                    size={18}
+                    color={temNaoLidas ? colors.primary : colors.iconMuted}
+                  />
+                </TouchableOpacity>
 
-                <Ionicons
-                  name="chevron-forward"
-                  size={18}
-                  color={temNaoLidas ? colors.primary : colors.iconMuted}
-                />
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.botaoExcluir}
+                  activeOpacity={0.85}
+                  onPress={() => excluirConversa(item.id)}
+                >
+                  <Ionicons name="trash-outline" size={18} color="#DC2626" />
+                </TouchableOpacity>
+              </View>
             );
           })}
         </View>
@@ -242,13 +352,20 @@ const styles = StyleSheet.create({
     paddingTop: 6,
   },
 
+  cardLinha: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+    gap: 8,
+  },
+
   card: {
+    flex: 1,
     backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 20,
-    padding: 14,
-    marginBottom: 12,
+    borderRadius: 22,
+    padding: 12,
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
@@ -259,17 +376,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#F8FAFF",
   },
 
-  cardIcone: {
-    width: 42,
-    height: 42,
-    borderRadius: 15,
-    backgroundColor: colors.primary,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  cardIconeNovo: {
-    backgroundColor: colors.primaryDark,
+  foto: {
+    width: 74,
+    height: 74,
+    borderRadius: 18,
+    backgroundColor: "#E5E7EB",
   },
 
   cardInfo: {
@@ -293,8 +404,15 @@ const styles = StyleSheet.create({
     color: colors.primaryDark,
   },
 
-  mensagem: {
+  infoAnuncio: {
     marginTop: 4,
+    fontSize: 12,
+    color: colors.textMuted,
+    fontWeight: "700",
+  },
+
+  mensagem: {
+    marginTop: 6,
     fontSize: 13,
     lineHeight: 18,
     color: colors.textMuted,
@@ -304,6 +422,13 @@ const styles = StyleSheet.create({
   mensagemNova: {
     color: colors.text,
     fontWeight: "900",
+  },
+
+  horario: {
+    marginTop: 6,
+    fontSize: 11,
+    color: colors.textMuted,
+    fontWeight: "700",
   },
 
   badge: {
@@ -320,6 +445,17 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 11,
     fontWeight: "900",
+  },
+
+  botaoExcluir: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#FCA5A5",
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   vazioBox: {

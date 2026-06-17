@@ -1,340 +1,743 @@
-import { useEffect, useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useState } from "react";
+
 import {
+  ActivityIndicator,
   Alert,
   Image,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
+  Linking,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 
-import { Ionicons } from "@expo/vector-icons";
-import {
-  User,
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  sendPasswordResetEmail,
-  signInWithEmailAndPassword,
-  signOut,
-} from "firebase/auth";
-
-import { auth } from "../services/firebase";
+import { useAuth } from "../contexts/AuthContext";
 import { colors } from "../utils/theme";
 
 export default function Conta() {
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [usuario, setUsuario] = useState<User | null>(null);
-  const [modoCadastro, setModoCadastro] = useState(false);
-  const [carregando, setCarregando] = useState(false);
+  const {
+    usuario,
+    carregando,
+    logout,
+    excluirConta,
+    biometriaDisponivel,
+    biometriaAtiva,
+    ativarBiometria,
+    desativarBiometria,
+  } = useAuth();
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUsuario(user);
-    });
+  const [
+    processandoBiometria,
+    setProcessandoBiometria,
+  ] = useState(false);
 
-    return unsubscribe;
-  }, []);
-
-  async function fazerLogin() {
-    if (!email.trim() || !senha.trim()) {
-      Alert.alert("Atenção", "Informe email e senha.");
-      return;
-    }
-
-    try {
-      setCarregando(true);
-      await signInWithEmailAndPassword(
-        auth,
-        email.trim().toLowerCase(),
-        senha
-      );
-    } catch (error: any) {
-      Alert.alert("Erro no login", "Email ou senha inválidos.");
-    } finally {
-      setCarregando(false);
-    }
-  }
-
-  async function fazerCadastro() {
-    if (!email.trim() || !senha.trim()) {
-      Alert.alert("Atenção", "Informe email e senha.");
-      return;
-    }
-
-    if (senha.length < 6) {
-      Alert.alert("Atenção", "A senha precisa ter pelo menos 6 caracteres.");
-      return;
-    }
-
-    try {
-      setCarregando(true);
-      await createUserWithEmailAndPassword(
-        auth,
-        email.trim().toLowerCase(),
-        senha
-      );
-      Alert.alert("Sucesso", "Conta criada com sucesso!");
-    } catch (error: any) {
-      Alert.alert("Erro", "Não foi possível criar a conta.");
-    } finally {
-      setCarregando(false);
-    }
-  }
-
-  async function recuperarSenha() {
-    if (!email.trim()) {
-      Alert.alert(
-        "Informe o email",
-        "Digite seu email para recuperar a senha."
-      );
-      return;
-    }
-
-    try {
-      await sendPasswordResetEmail(auth, email.trim().toLowerCase());
-      Alert.alert("Email enviado", "Verifique sua caixa de entrada.");
-    } catch {
-      Alert.alert("Erro", "Não foi possível enviar o email.");
-    }
-  }
+  const [
+    processandoExclusao,
+    setProcessandoExclusao,
+  ] = useState(false);
 
   async function sair() {
-    await signOut(auth);
-    setEmail("");
-    setSenha("");
+    try {
+      await logout();
+
+      router.replace(
+        "/login"
+      );
+    } catch {
+      Alert.alert(
+        "Erro",
+        "Não foi possível sair."
+      );
+    }
   }
 
-  // LOGADO
-  if (usuario) {
+  async function confirmarExcluirConta() {
+    Alert.alert(
+      "Excluir conta",
+      "Esta ação removerá permanentemente sua conta do Volante App. Deseja continuar?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: () => {
+            Alert.alert(
+              "Confirmar exclusão",
+              "Tem certeza? Esta ação não poderá ser desfeita.",
+              [
+                {
+                  text: "Cancelar",
+                  style: "cancel",
+                },
+                {
+                  text: "Excluir definitivamente",
+                  style: "destructive",
+                  onPress: excluirContaDefinitivamente,
+                },
+              ]
+            );
+          },
+        },
+      ]
+    );
+  }
+
+  async function excluirContaDefinitivamente() {
+    try {
+      setProcessandoExclusao(
+        true
+      );
+
+      await excluirConta();
+
+      Alert.alert(
+        "Conta excluída",
+        "Sua conta foi excluída com sucesso."
+      );
+
+      router.replace(
+        "/login"
+      );
+    } catch (error: any) {
+      let mensagem =
+        "Não foi possível excluir sua conta. Saia, entre novamente e tente outra vez.";
+
+      if (
+        error?.code ===
+        "auth/requires-recent-login"
+      ) {
+        mensagem =
+          "Por segurança, entre novamente no aplicativo e tente excluir a conta outra vez.";
+      }
+
+      Alert.alert(
+        "Erro",
+        mensagem
+      );
+    } finally {
+      setProcessandoExclusao(
+        false
+      );
+    }
+  }
+
+  async function alternarBiometria() {
+    try {
+      setProcessandoBiometria(
+        true
+      );
+
+      if (
+        biometriaAtiva
+      ) {
+        await desativarBiometria();
+
+        Alert.alert(
+          "Biometria desativada",
+          "O login rápido foi desativado."
+        );
+
+        return;
+      }
+
+      const sucesso =
+        await ativarBiometria();
+
+      if (
+        !sucesso
+      ) {
+        Alert.alert(
+          "Biometria indisponível",
+          "Não foi possível ativar a biometria neste aparelho."
+        );
+
+        return;
+      }
+
+      Alert.alert(
+        "Biometria ativada",
+        "Login rápido ativado com sucesso."
+      );
+    } finally {
+      setProcessandoBiometria(
+        false
+      );
+    }
+  }
+
+  async function falarComVolante() {
+    const mensagem =
+      encodeURIComponent(
+        "Olá! Estou utilizando o Volante App e gostaria de tirar uma dúvida."
+      );
+
+    const url =
+      `https://wa.me/5561991663179?text=${mensagem}`;
+
+    const podeAbrir =
+      await Linking.canOpenURL(
+        url
+      );
+
+    if (
+      podeAbrir
+    ) {
+      await Linking.openURL(
+        url
+      );
+
+      return;
+    }
+
+    Alert.alert(
+      "WhatsApp indisponível",
+      "Não foi possível abrir o WhatsApp neste aparelho."
+    );
+  }
+
+  if (
+    carregando ||
+    !usuario
+  ) {
     return (
-      <View style={styles.containerLogado}>
-        <View style={styles.card}>
-          <Image
-            source={require("../assets/images/logo.png")}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-
-          <Text style={styles.titulo}>Minha conta</Text>
-
-          <Text style={styles.label}>Logado como</Text>
-          <Text style={styles.email}>{usuario.email}</Text>
-
-          <TouchableOpacity style={styles.botaoSair} onPress={sair}>
-            <Text style={styles.textoBotaoSair}>Sair</Text>
-          </TouchableOpacity>
-        </View>
+      <View
+        style={
+          styles.loadingContainer
+        }
+      >
+        <ActivityIndicator
+          size="large"
+          color={
+            colors.primary
+          }
+        />
       </View>
     );
   }
 
-  // LOGIN
   return (
-    <KeyboardAvoidingView
-      style={styles.tela}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    <View
+      style={
+        styles.container
+      }
     >
-      <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.box}>
-          <Image
-            source={require("../assets/images/logo.png")}
-            style={styles.logo}
-            resizeMode="contain"
+      <View
+        style={
+          styles.conteudo
+        }
+      >
+        <Image
+          source={
+            require(
+              "../assets/images/logo.png"
+            )
+          }
+          style={
+            styles.logo
+          }
+          resizeMode="contain"
+        />
+
+        <Text
+          style={
+            styles.nomeApp
+          }
+        >
+          Volante
+        </Text>
+
+        <Text
+          style={
+            styles.titulo
+          }
+        >
+          Minha conta
+        </Text>
+
+        <View
+          style={
+            styles.emailCard
+          }
+        >
+          <Ionicons
+            name="person-circle"
+            size={24}
+            color={
+              colors.text
+            }
           />
 
-          <TextInput
-            placeholder="Email"
-            placeholderTextColor={colors.iconMuted}
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-          />
+          <Text
+            style={
+              styles.email
+            }
+            numberOfLines={1}
+          >
+            {usuario.email}
+          </Text>
+        </View>
 
-          <TextInput
-            placeholder="Senha"
-            placeholderTextColor={colors.iconMuted}
-            style={styles.input}
-            value={senha}
-            onChangeText={setSenha}
-            secureTextEntry
-          />
+        <TouchableOpacity
+          style={
+            styles.linha
+          }
+          onPress={
+            sair
+          }
+          activeOpacity={0.85}
+        >
+          <View
+            style={
+              styles.linhaEsquerda
+            }
+          >
+            <Ionicons
+              name="log-out-outline"
+              size={22}
+              color={
+                colors.textMuted
+              }
+            />
 
-          {!modoCadastro && (
-            <TouchableOpacity onPress={recuperarSenha}>
-              <Text style={styles.esqueci}>Esqueci minha senha</Text>
-            </TouchableOpacity>
-          )}
+            <Text
+              style={
+                styles.linhaTitulo
+              }
+            >
+              Sair
+            </Text>
+          </View>
+
+          <Ionicons
+            name="chevron-forward"
+            size={21}
+            color={
+              colors.textMuted
+            }
+          />
+        </TouchableOpacity>
+
+        <View
+          style={
+            styles.linha
+          }
+        >
+          <View
+            style={
+              styles.linhaEsquerda
+            }
+          >
+            <View
+              style={
+                styles.iconeVerde
+              }
+            >
+              <Ionicons
+                name="finger-print"
+                size={22}
+                color="#16A34A"
+              />
+            </View>
+
+            <Text
+              style={
+                styles.linhaTitulo
+              }
+            >
+              Biometria
+            </Text>
+          </View>
 
           <TouchableOpacity
-            style={styles.botaoPrincipal}
-            onPress={modoCadastro ? fazerCadastro : fazerLogin}
-            disabled={carregando}
+            style={[
+              styles.botaoBiometria,
+
+              (!biometriaDisponivel &&
+                !biometriaAtiva) &&
+                styles.botaoBiometriaDesabilitado,
+            ]}
+            onPress={
+              alternarBiometria
+            }
+            activeOpacity={0.85}
+            disabled={
+              processandoBiometria ||
+              (!biometriaDisponivel &&
+                !biometriaAtiva)
+            }
           >
-            <Text style={styles.textoBotao}>
-              {carregando
-                ? "Aguarde..."
-                : modoCadastro
-                ? "Criar conta"
-                : "Entrar"}
-            </Text>
+            {processandoBiometria ? (
+              <ActivityIndicator
+                size="small"
+                color={
+                  colors.primary
+                }
+              />
+            ) : (
+              <Text
+                style={
+                  styles.botaoBiometriaTexto
+                }
+              >
+                {biometriaAtiva
+                  ? "Desativar"
+                  : "Ativar"}
+              </Text>
+            )}
           </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => setModoCadastro(!modoCadastro)}>
-            <Text style={styles.link}>
-              {modoCadastro ? "Já tenho conta" : "Criar uma conta"}
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.botaoGoogle}>
-            <Ionicons name="logo-google" size={20} color="#555" />
-            <Text style={styles.textoGoogle}>Entrar com Google</Text>
-          </TouchableOpacity>
-
-          <Text style={styles.info}>Google será ativado em breve</Text>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+
+        <TouchableOpacity
+          style={
+            styles.linha
+          }
+          onPress={
+            falarComVolante
+          }
+          activeOpacity={0.85}
+        >
+          <View
+            style={
+              styles.linhaEsquerda
+            }
+          >
+            <View
+              style={
+                styles.iconeVerde
+              }
+            >
+              <Ionicons
+                name="logo-whatsapp"
+                size={22}
+                color="#16A34A"
+              />
+            </View>
+
+            <View>
+              <Text
+                style={
+                  styles.linhaTitulo
+                }
+              >
+                WhatsApp
+              </Text>
+
+              <Text
+                style={
+                  styles.linhaSubtitulo
+                }
+              >
+                Falar com o Volante
+              </Text>
+            </View>
+          </View>
+
+          <Ionicons
+            name="chevron-forward"
+            size={21}
+            color={
+              colors.textMuted
+            }
+          />
+        </TouchableOpacity>
+      </View>
+
+      <TouchableOpacity
+        style={
+          styles.excluirConta
+        }
+        onPress={
+          confirmarExcluirConta
+        }
+        activeOpacity={0.85}
+        disabled={
+          processandoExclusao
+        }
+      >
+        {processandoExclusao ? (
+          <ActivityIndicator
+            size="small"
+            color="#DC2626"
+          />
+        ) : (
+          <>
+            <Ionicons
+              name="trash-outline"
+              size={16}
+              color="#DC2626"
+            />
+
+            <Text
+              style={
+                styles.excluirContaTexto
+              }
+            >
+              Excluir conta
+            </Text>
+          </>
+        )}
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  tela: {
+  loadingContainer: {
     flex: 1,
-    backgroundColor: colors.background,
+
+    justifyContent:
+      "center",
+
+    alignItems:
+      "center",
+
+    backgroundColor:
+      colors.background,
   },
 
   container: {
-    flexGrow: 1,
-    justifyContent: "center",
-    padding: 24,
+    flex: 1,
+
+    backgroundColor:
+      colors.background,
+
+    paddingHorizontal: 22,
+
+    paddingTop: 40,
+
+    paddingBottom: 96,
   },
 
-  box: {
+  conteudo: {
     width: "100%",
+
+    alignItems:
+      "center",
   },
 
   logo: {
-    width: 120,
-    height: 100,
-    alignSelf: "center",
-    marginBottom: 24,
+    width: 58,
+
+    height: 58,
+
+    marginBottom: 2,
+
+    alignSelf:
+      "center",
   },
 
-  input: {
-    height: 52,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 14,
-    paddingHorizontal: 15,
-    marginBottom: 12,
-    backgroundColor: colors.surface,
-    color: colors.text,
-  },
+  nomeApp: {
+    fontSize: 18,
 
-  esqueci: {
-    textAlign: "right",
-    color: colors.primary,
-    marginBottom: 10,
-    fontWeight: "600",
-  },
+    fontWeight:
+      "900",
 
-  botaoPrincipal: {
-    backgroundColor: colors.primary,
-    padding: 16,
-    borderRadius: 14,
-    alignItems: "center",
-    marginTop: 6,
-  },
+    color:
+      colors.text,
 
-  textoBotao: {
-    color: "#FFFFFF",
-    fontWeight: "900",
-  },
-
-  link: {
-    marginTop: 15,
-    color: colors.primary,
-    textAlign: "center",
-    fontWeight: "600",
-  },
-
-  botaoGoogle: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 14,
-    padding: 14,
-    marginTop: 15,
-    backgroundColor: "#FFFFFF",
-  },
-
-  textoGoogle: {
-    color: "#333333",
-    fontWeight: "bold",
-  },
-
-  info: {
-    marginTop: 8,
-    textAlign: "center",
-    color: "#999999",
-    fontSize: 12,
-  },
-
-  containerLogado: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 24,
-    backgroundColor: colors.background,
-  },
-
-  card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
+    marginBottom: 22,
   },
 
   titulo: {
-    fontSize: 20,
-    fontWeight: "900",
-    textAlign: "center",
-    marginBottom: 15,
-    color: colors.text,
+    fontSize: 28,
+
+    fontWeight:
+      "900",
+
+    color:
+      colors.text,
+
+    marginBottom: 22,
   },
 
-  label: {
-    textAlign: "center",
-    color: colors.textMuted,
+  emailCard: {
+    width: "100%",
+
+    height: 52,
+
+    borderRadius: 14,
+
+    backgroundColor:
+      "#F8FAFC",
+
+    flexDirection:
+      "row",
+
+    alignItems:
+      "center",
+
+    paddingHorizontal: 14,
+
+    gap: 10,
+
+    marginBottom: 18,
   },
 
   email: {
-    textAlign: "center",
-    fontWeight: "bold",
-    marginTop: 5,
-    color: colors.text,
+    flex: 1,
+
+    fontSize: 13,
+
+    fontWeight:
+      "800",
+
+    color:
+      colors.text,
   },
 
-  botaoSair: {
-    backgroundColor: colors.primary,
-    padding: 15,
-    borderRadius: 12,
-    marginTop: 20,
-    alignItems: "center",
+  linha: {
+    width: "100%",
+
+    minHeight: 56,
+
+    borderRadius: 14,
+
+    backgroundColor:
+      "#FFFFFF",
+
+    borderWidth: 1,
+
+    borderColor:
+      colors.border,
+
+    flexDirection:
+      "row",
+
+    alignItems:
+      "center",
+
+    justifyContent:
+      "space-between",
+
+    paddingHorizontal: 14,
+
+    marginBottom: 12,
   },
 
-  textoBotaoSair: {
-    color: "#FFFFFF",
-    fontWeight: "900",
+  linhaEsquerda: {
+    flexDirection:
+      "row",
+
+    alignItems:
+      "center",
+
+    gap: 11,
+  },
+
+  linhaTitulo: {
+    fontSize: 13,
+
+    fontWeight:
+      "900",
+
+    color:
+      colors.text,
+  },
+
+  linhaSubtitulo: {
+    fontSize: 10,
+
+    fontWeight:
+      "700",
+
+    color:
+      colors.textMuted,
+
+    marginTop: 2,
+  },
+
+  iconeVerde: {
+    width: 30,
+
+    height: 30,
+
+    borderRadius: 9,
+
+    backgroundColor:
+      "#DCFCE7",
+
+    alignItems:
+      "center",
+
+    justifyContent:
+      "center",
+  },
+
+  botaoBiometria: {
+    minWidth: 58,
+
+    height: 30,
+
+    borderRadius: 8,
+
+    borderWidth: 1,
+
+    borderColor:
+      colors.primary,
+
+    backgroundColor:
+      "#FFFFFF",
+
+    alignItems:
+      "center",
+
+    justifyContent:
+      "center",
+
+    paddingHorizontal: 9,
+  },
+
+  botaoBiometriaDesabilitado: {
+    borderColor:
+      colors.border,
+
+    opacity: 0.55,
+  },
+
+  botaoBiometriaTexto: {
+    fontSize: 11,
+
+    fontWeight:
+      "900",
+
+    color:
+      colors.primary,
+  },
+
+  excluirConta: {
+    position:
+      "absolute",
+
+    left: 0,
+
+    right: 0,
+
+    bottom: 118,
+
+    flexDirection:
+      "row",
+
+    alignItems:
+      "center",
+
+    justifyContent:
+      "center",
+
+    gap: 6,
+  },
+
+  excluirContaTexto: {
+    fontSize: 12,
+
+    fontWeight:
+      "900",
+
+    color:
+      "#DC2626",
   },
 });

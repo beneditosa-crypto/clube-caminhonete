@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Alert,
   Image,
@@ -66,9 +66,32 @@ export default function Publicar() {
   const [modalEstado, setModalEstado] = useState(false);
   const [modalCidade, setModalCidade] = useState(false);
 
+  const [buscaEstado, setBuscaEstado] = useState("");
+  const [buscaCidade, setBuscaCidade] = useState("");
+
   const [fotos, setFotos] = useState<string[]>([]);
 
   const editando = Boolean(id);
+
+  const estadosFiltrados = useMemo(() => {
+    const termo = buscaEstado.trim().toLowerCase();
+
+    if (!termo) return estados;
+
+    return estados.filter((item) =>
+      `${item.nome} ${item.sigla}`.toLowerCase().includes(termo)
+    );
+  }, [buscaEstado, estados]);
+
+  const cidadesFiltradas = useMemo(() => {
+    const termo = buscaCidade.trim().toLowerCase();
+
+    if (!termo) return cidades;
+
+    return cidades.filter((item) =>
+      item.nome.toLowerCase().includes(termo)
+    );
+  }, [buscaCidade, cidades]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -109,10 +132,14 @@ export default function Publicar() {
     }
   }
 
-  async function buscarCidades(siglaEstado: string) {
+  async function buscarCidades(siglaEstado: string, limparCidade = true) {
     try {
-      setCidade("");
+      if (limparCidade) {
+        setCidade("");
+      }
+
       setCidades([]);
+      setBuscaCidade("");
 
       const resposta = await fetch(
         `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${siglaEstado}/municipios?orderBy=nome`
@@ -143,7 +170,7 @@ export default function Publicar() {
       setMarca(dados.marca || "");
       setModelo(dados.modelo || "");
       setAno(dados.ano ? String(dados.ano) : "");
-      setPreco(formatarPrecoTexto(String(dados.preco || "")));
+      setPreco(formatarPrecoBanco(dados.preco));
       setDescricao(dados.descricao || "");
       setTelefone(dados.telefone || "");
       setEstado(dados.estado || "");
@@ -151,11 +178,41 @@ export default function Publicar() {
       setFotos(Array.isArray(dados.fotos) ? dados.fotos : []);
 
       if (dados.estado) {
-        buscarCidades(dados.estado);
+        buscarCidades(dados.estado, false);
       }
     } catch {
       Alert.alert("Erro", "Não foi possível carregar o anúncio.");
     }
+  }
+
+  function formatarPrecoBanco(valor: any) {
+    if (valor === undefined || valor === null || valor === "") return "";
+
+    if (typeof valor === "number") {
+      return valor.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      });
+    }
+
+    const texto = String(valor).trim();
+
+    if (!texto) return "";
+
+    if (texto.startsWith("R$")) {
+      return texto;
+    }
+
+    const numero = Number(texto.replace(/\./g, "").replace(",", "."));
+
+    if (!Number.isNaN(numero)) {
+      return numero.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      });
+    }
+
+    return "";
   }
 
   function formatarPrecoTexto(valor: string) {
@@ -492,7 +549,10 @@ export default function Publicar() {
 
           <TouchableOpacity
             style={styles.select}
-            onPress={() => setModalEstado(true)}
+            onPress={() => {
+              setBuscaEstado("");
+              setModalEstado(true);
+            }}
           >
             <Text style={estado ? styles.selectTexto : styles.placeholder}>
               {estado || "Selecionar estado"}
@@ -507,6 +567,7 @@ export default function Publicar() {
                 return;
               }
 
+              setBuscaCidade("");
               setModalCidade(true);
             }}
           >
@@ -555,14 +616,24 @@ export default function Publicar() {
         <View style={styles.modalContainer}>
           <Text style={styles.modalTitulo}>Selecionar estado</Text>
 
+          <TextInput
+            style={styles.inputBuscaModal}
+            placeholder="Buscar estado..."
+            placeholderTextColor={colors.iconMuted}
+            value={buscaEstado}
+            onChangeText={setBuscaEstado}
+            autoCapitalize="words"
+          />
+
           <ScrollView showsVerticalScrollIndicator={false}>
-            {estados.map((item) => (
+            {estadosFiltrados.map((item) => (
               <TouchableOpacity
                 key={item.id}
                 style={styles.itemLista}
                 onPress={() => {
                   setEstado(item.sigla);
                   setModalEstado(false);
+                  setBuscaEstado("");
                   buscarCidades(item.sigla);
                 }}
               >
@@ -571,11 +642,20 @@ export default function Publicar() {
                 </Text>
               </TouchableOpacity>
             ))}
+
+            {estadosFiltrados.length === 0 && (
+              <Text style={styles.textoVazioModal}>
+                Nenhum estado encontrado.
+              </Text>
+            )}
           </ScrollView>
 
           <TouchableOpacity
             style={styles.botaoFecharModal}
-            onPress={() => setModalEstado(false)}
+            onPress={() => {
+              setModalEstado(false);
+              setBuscaEstado("");
+            }}
           >
             <Text style={styles.textoFecharModal}>Fechar</Text>
           </TouchableOpacity>
@@ -586,24 +666,43 @@ export default function Publicar() {
         <View style={styles.modalContainer}>
           <Text style={styles.modalTitulo}>Selecionar cidade</Text>
 
+          <TextInput
+            style={styles.inputBuscaModal}
+            placeholder="Buscar cidade..."
+            placeholderTextColor={colors.iconMuted}
+            value={buscaCidade}
+            onChangeText={setBuscaCidade}
+            autoCapitalize="words"
+          />
+
           <ScrollView showsVerticalScrollIndicator={false}>
-            {cidades.map((item) => (
+            {cidadesFiltradas.map((item) => (
               <TouchableOpacity
                 key={item.id}
                 style={styles.itemLista}
                 onPress={() => {
                   setCidade(item.nome);
                   setModalCidade(false);
+                  setBuscaCidade("");
                 }}
               >
                 <Text style={styles.itemTexto}>{item.nome}</Text>
               </TouchableOpacity>
             ))}
+
+            {cidadesFiltradas.length === 0 && (
+              <Text style={styles.textoVazioModal}>
+                Nenhuma cidade encontrada.
+              </Text>
+            )}
           </ScrollView>
 
           <TouchableOpacity
             style={styles.botaoFecharModal}
-            onPress={() => setModalCidade(false)}
+            onPress={() => {
+              setModalCidade(false);
+              setBuscaCidade("");
+            }}
           >
             <Text style={styles.textoFecharModal}>Fechar</Text>
           </TouchableOpacity>
@@ -709,6 +808,20 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     fontWeight: "600",
+  },
+
+  inputBuscaModal: {
+    backgroundColor: colors.surface,
+    borderRadius: 12,
+    paddingHorizontal: 13,
+    paddingVertical: 10,
+    minHeight: 44,
+    fontSize: 14,
+    color: colors.text,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: colors.border,
+    fontWeight: "700",
   },
 
   textArea: {
@@ -842,6 +955,14 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontSize: 14,
     fontWeight: "600",
+  },
+
+  textoVazioModal: {
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    color: colors.textMuted,
+    fontSize: 13,
+    fontWeight: "700",
   },
 
   botaoFecharModal: {

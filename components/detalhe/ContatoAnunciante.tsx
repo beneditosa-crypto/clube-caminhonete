@@ -9,6 +9,7 @@ import {
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
+
 import { router } from "expo-router";
 
 import {
@@ -17,6 +18,7 @@ import {
   getDocs,
   query,
   serverTimestamp,
+  updateDoc,
   where,
 } from "firebase/firestore";
 
@@ -49,26 +51,84 @@ export default function ContatoAnunciante({
   const anuncianteEmail = email?.trim().toLowerCase();
 
   const ehMeuAnuncio =
-    !!usuarioEmail &&
-    !!anuncianteEmail &&
-    usuarioEmail === anuncianteEmail;
+    !!usuarioEmail && !!anuncianteEmail && usuarioEmail === anuncianteEmail;
 
   function exigirLogin() {
     if (!usuarioLogado?.email) {
       Alert.alert(
         "Login necessário",
-        "Faça login para entrar em contato ou compartilhar."
+        "Faça login para entrar em contato com o anunciante."
       );
 
       router.push("/login");
-
       return false;
     }
 
     return true;
   }
 
-  function chamarWhatsApp() {
+  function gerarSlug(texto: string) {
+    return texto
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
+  function gerarLinkCompartilhamento() {
+    if (!anuncioId) {
+      return "https://volante.app.br";
+    }
+
+    const tituloSlug = gerarSlug(titulo || "anuncio");
+
+    return `https://volante.app.br/anuncio/${tituloSlug}-${anuncioId}`;
+  }
+
+  function formatarPreco(valor?: string | number) {
+    if (valor === undefined || valor === null || valor === "") {
+      return "";
+    }
+
+    const numero =
+      typeof valor === "number"
+        ? valor
+        : Number(String(valor).replace(/\D/g, ""));
+
+    if (!numero || Number.isNaN(numero)) {
+      return "";
+    }
+
+    return numero.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+  }
+
+  function gerarTextoCompartilhamento() {
+    const precoTexto = formatarPreco(preco);
+
+    const localTexto =
+      cidade || estado
+        ? `${cidade || ""}${cidade && estado ? " - " : ""}${estado || ""}`
+        : "";
+
+    const linhas = [
+      titulo || "Veículo anunciado",
+      "",
+      precoTexto,
+      "",
+      localTexto,
+      "",
+      "Veja este anúncio no Volante:",
+      gerarLinkCompartilhamento(),
+    ];
+
+    return linhas.join("\n");
+  }
+
+  async function chamarWhatsApp() {
     if (!exigirLogin()) return;
 
     if (ehMeuAnuncio) {
@@ -97,35 +157,11 @@ export default function ContatoAnunciante({
     Linking.openURL(`https://wa.me/55${numero}?text=${mensagem}`);
   }
 
-  async function compartilhar() {
-    if (!exigirLogin()) return;
-
-    const precoTexto =
-      preco !== undefined && preco !== null && preco !== ""
-        ? `💰 ${preco}`
-        : "";
-
-    const localTexto =
-      cidade || estado
-        ? `📍 ${cidade || ""}${cidade && estado ? " - " : ""}${estado || ""}`
-        : "";
-
-    const link = anuncioId
-      ? `https://volante.app.br/api/og?tipo=anuncio&id=${anuncioId}`
-      : "https://volante.app.br";
-
-    const mensagem =
-      `🚗 ${titulo || "Veículo anunciado"}\n\n` +
-      `${precoTexto}\n` +
-      `${localTexto}\n\n` +
-      `Vi este anúncio no Volante.\n\n` +
-      `Confira:\n${link}`;
-
+  async function compartilharAnuncio() {
     try {
       await Share.share({
-        title: titulo || "Anúncio Volante",
-        message: mensagem,
-        url: foto,
+        title: titulo || "Volante App",
+        message: gerarTextoCompartilhamento(),
       });
     } catch {
       Alert.alert("Erro", "Não foi possível compartilhar o anúncio.");
@@ -160,12 +196,16 @@ export default function ContatoAnunciante({
         const dados = documento.data();
 
         return (
-          dados.vendedorEmail === vendedorEmail &&
-          dados.anuncioId === anuncioId
+          dados.vendedorEmail === vendedorEmail && dados.anuncioId === anuncioId
         );
       });
 
       if (conversaExistente) {
+        await updateDoc(conversaExistente.ref, {
+          ocultoPara: [],
+          atualizadoEm: serverTimestamp(),
+        });
+
         router.push(`/conversa/${conversaExistente.id}` as any);
         return;
       }
@@ -173,12 +213,18 @@ export default function ContatoAnunciante({
       const conversa = await addDoc(collection(db, "conversas"), {
         anuncioId,
         anuncioTitulo: titulo || "Veículo anunciado",
+        anuncioPreco:
+          preco !== undefined && preco !== null ? String(preco) : "",
+        anuncioCidade: cidade || "",
+        anuncioEstado: estado || "",
+        anuncioFoto: foto || "",
         compradorEmail,
         vendedorEmail,
         participantes: [compradorEmail, vendedorEmail],
         ultimaMensagem: "",
         naoLidasComprador: 0,
         naoLidasVendedor: 0,
+        ocultoPara: [],
         criadoEm: serverTimestamp(),
         atualizadoEm: serverTimestamp(),
       });
@@ -192,42 +238,57 @@ export default function ContatoAnunciante({
   return (
     <View style={styles.container}>
       {!ehMeuAnuncio && (
-        <View style={styles.linhaBotoes}>
-          <TouchableOpacity
-            style={[styles.botao, styles.botaoMensagem]}
-            onPress={enviarMensagem}
-            activeOpacity={0.85}
-          >
-            <Ionicons
-              name="chatbubble-ellipses-outline"
-              size={18}
-              color="#FFFFFF"
-            />
-            <Text style={styles.textoBotao}>Mensagem</Text>
-          </TouchableOpacity>
+        <>
+          <View style={styles.topoContato}>
+            <Text style={styles.contatoTitulo}>
+              Entre em contato com o anunciante
+            </Text>
 
-          <TouchableOpacity
-            style={[styles.botao, styles.botaoWhatsApp]}
-            onPress={chamarWhatsApp}
-            activeOpacity={0.85}
-          >
-            <Ionicons name="logo-whatsapp" size={18} color="#FFFFFF" />
-            <Text style={styles.textoBotao}>WhatsApp</Text>
-          </TouchableOpacity>
-        </View>
+            <Text style={styles.contatoSubtitulo}>
+              Tire dúvidas e negocie com segurança.
+            </Text>
+          </View>
+
+          <View style={styles.linhaPrincipal}>
+            <TouchableOpacity
+              style={[styles.botaoPrincipal, styles.botaoMensagem]}
+              onPress={enviarMensagem}
+              activeOpacity={0.85}
+            >
+              <Ionicons
+                name="chatbubble-ellipses-outline"
+                size={18}
+                color="#FFFFFF"
+              />
+
+              <Text style={styles.textoBotaoPrincipal}>Mensagem</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.botaoPrincipal, styles.botaoWhatsApp]}
+              onPress={chamarWhatsApp}
+              activeOpacity={0.85}
+            >
+              <Ionicons name="logo-whatsapp" size={18} color="#FFFFFF" />
+              <Text style={styles.textoBotaoPrincipal}>WhatsApp</Text>
+            </TouchableOpacity>
+          </View>
+        </>
       )}
 
-      <TouchableOpacity
-        style={[
-          styles.botaoCompartilhar,
-          ehMeuAnuncio && styles.botaoCompartilharUnico,
-        ]}
-        onPress={compartilhar}
-        activeOpacity={0.85}
-      >
-        <Ionicons name="share-social-outline" size={18} color="#FFFFFF" />
-        <Text style={styles.textoBotao}>Compartilhar anúncio</Text>
-      </TouchableOpacity>
+      <View style={styles.areaCompartilhar}>
+        <TouchableOpacity
+          style={styles.botaoCompartilharUnico}
+          onPress={compartilharAnuncio}
+          activeOpacity={0.85}
+        >
+          <Ionicons name="share-social-outline" size={18} color="#FFFFFF" />
+
+          <Text style={styles.textoCompartilharUnico}>
+            Compartilhar anúncio
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -235,27 +296,43 @@ export default function ContatoAnunciante({
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    alignItems: "center",
   },
 
-  linhaBotoes: {
+  topoContato: {
     width: "100%",
+    marginBottom: 14,
+  },
+
+  contatoTitulo: {
+    fontSize: 13,
+    fontWeight: "900",
+    color: "#6B7280",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+
+  contatoSubtitulo: {
+    marginTop: 5,
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: "600",
+    color: "#9CA3AF",
+  },
+
+  linhaPrincipal: {
     flexDirection: "row",
     gap: 10,
-    alignItems: "center",
-    justifyContent: "center",
   },
 
-  botao: {
+  botaoPrincipal: {
     flex: 1,
-    minHeight: 46,
-    borderRadius: 15,
-    paddingHorizontal: 10,
-    paddingVertical: 12,
+    minHeight: 50,
+    borderRadius: 16,
+    paddingHorizontal: 14,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 6,
+    gap: 7,
   },
 
   botaoMensagem: {
@@ -266,28 +343,38 @@ const styles = StyleSheet.create({
     backgroundColor: "#22C55E",
   },
 
-  botaoCompartilhar: {
+  textoBotaoPrincipal: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "900",
+  },
+
+  areaCompartilhar: {
+    marginTop: 18,
     width: "100%",
-    minHeight: 46,
-    marginTop: 10,
-    borderRadius: 15,
+    backgroundColor: "#F9FAFB",
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    paddingVertical: 14,
     paddingHorizontal: 14,
-    paddingVertical: 12,
-    backgroundColor: "#374151",
-    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
   },
 
   botaoCompartilharUnico: {
-    marginTop: 0,
+    width: "100%",
+    minHeight: 52,
+    borderRadius: 16,
+    backgroundColor: "#1E3A8A",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
   },
 
-  textoBotao: {
+  textoCompartilharUnico: {
     color: "#FFFFFF",
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: "900",
-    textAlign: "center",
   },
 });

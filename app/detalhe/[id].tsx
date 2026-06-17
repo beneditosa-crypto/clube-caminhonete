@@ -1,3 +1,6 @@
+import { useLocalSearchParams } from "expo-router";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -7,17 +10,14 @@ import {
   Text,
   View,
 } from "react-native";
-import { useLocalSearchParams } from "expo-router";
-import { onAuthStateChanged, User } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
 
 import { auth, db } from "../../services/firebase";
 
-import AppHeader from "../../components/layout/AppHeader";
 import BotaoVoltar from "../../components/detalhe/BotaoVoltar";
 import ContatoAnunciante from "../../components/detalhe/ContatoAnunciante";
 import GaleriaFotos from "../../components/detalhe/GaleriaFotos";
 import InfoVeiculo from "../../components/detalhe/InfoVeiculo";
+import AppHeader from "../../components/layout/AppHeader";
 
 type Anuncio = {
   id: string;

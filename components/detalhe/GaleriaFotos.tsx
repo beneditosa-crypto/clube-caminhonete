@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import {
   Dimensions,
@@ -10,7 +11,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 
 type Props = {
   fotos?: string[];
@@ -60,6 +60,19 @@ export default function GaleriaFotos({ fotos }: Props) {
 
               <View style={styles.sombraInferior} />
 
+              <View style={styles.marcaDagua}>
+                <Image
+                  source={require("../../assets/images/logo.png")}
+                  style={styles.logoMarcaDagua}
+                  resizeMode="contain"
+                />
+
+                <View>
+                  <Text style={styles.marcaDaguaTitulo}>Volante</Text>
+                  <Text style={styles.marcaDaguaSite}>volante.app.br</Text>
+                </View>
+              </View>
+
               <View style={styles.contador}>
                 <Ionicons name="images-outline" size={13} color="#FFFFFF" />
                 <Text style={styles.contadorTexto}>
@@ -92,11 +105,28 @@ export default function GaleriaFotos({ fotos }: Props) {
           </Pressable>
 
           {fotoAberta ? (
-            <Image
-              source={{ uri: fotoAberta }}
-              style={styles.imagemGrande}
-              resizeMode="contain"
-            />
+            <View style={styles.modalImagemBox}>
+              <Image
+                source={{ uri: fotoAberta }}
+                style={styles.imagemGrande}
+                resizeMode="contain"
+              />
+
+              <View style={styles.marcaDaguaModal}>
+                <Image
+                  source={require("../../assets/images/logo.png")}
+                  style={styles.logoMarcaDaguaModal}
+                  resizeMode="contain"
+                />
+
+                <View>
+                  <Text style={styles.marcaDaguaTituloModal}>Volante</Text>
+                  <Text style={styles.marcaDaguaSiteModal}>
+                    volante.app.br
+                  </Text>
+                </View>
+              </View>
+            </View>
           ) : null}
         </View>
       </Modal>
@@ -133,8 +163,41 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: 72,
-    backgroundColor: "rgba(0,0,0,0.20)",
+    height: 58,
+    backgroundColor: "rgba(0,0,0,0.16)",
+  },
+
+  marcaDagua: {
+    position: "absolute",
+    left: 10,
+    bottom: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: "rgba(0,0,0,0.30)",
+    borderRadius: 999,
+    paddingVertical: 3,
+    paddingLeft: 4,
+    paddingRight: 7,
+  },
+
+  logoMarcaDagua: {
+    width: 18,
+    height: 18,
+  },
+
+  marcaDaguaTitulo: {
+    color: "#FFFFFF",
+    fontSize: 9,
+    fontWeight: "900",
+    lineHeight: 10,
+  },
+
+  marcaDaguaSite: {
+    color: "#E5E7EB",
+    fontSize: 7,
+    fontWeight: "700",
+    lineHeight: 8,
   },
 
   contador: {
@@ -213,8 +276,48 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  imagemGrande: {
+  modalImagemBox: {
     width: larguraTela,
     height: "84%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  imagemGrande: {
+    width: larguraTela,
+    height: "100%",
+  },
+
+  marcaDaguaModal: {
+    position: "absolute",
+    left: 14,
+    bottom: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    backgroundColor: "rgba(0,0,0,0.34)",
+    borderRadius: 999,
+    paddingVertical: 4,
+    paddingLeft: 5,
+    paddingRight: 8,
+  },
+
+  logoMarcaDaguaModal: {
+    width: 20,
+    height: 20,
+  },
+
+  marcaDaguaTituloModal: {
+    color: "#FFFFFF",
+    fontSize: 10,
+    fontWeight: "900",
+    lineHeight: 11,
+  },
+
+  marcaDaguaSiteModal: {
+    color: "#E5E7EB",
+    fontSize: 8,
+    fontWeight: "700",
+    lineHeight: 9,
   },
 });
